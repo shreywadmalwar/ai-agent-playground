@@ -9,11 +9,13 @@ export function MessageInput({
   onStop,
   busy,
   disabled,
+  disabledReason,
 }: {
   onSend: (prompt: string) => void
   onStop: () => void
   busy: boolean
   disabled: boolean // true when zero models are sendable
+  disabledReason: string // tells the user WHY it's disabled (no keys vs. all toggled off)
 }) {
   const [value, setValue] = useState('')
 
@@ -38,9 +40,7 @@ export function MessageInput({
         }}
         rows={2}
         placeholder={
-          disabled
-            ? 'Add an API key in Settings to start chatting…'
-            : 'Ask all active models… (Enter to send, Shift+Enter for newline)'
+          disabled ? disabledReason : 'Ask all active models… (Enter to send, Shift+Enter for newline)'
         }
         disabled={disabled}
         className="min-h-[3rem] flex-1 resize-y rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-indigo-500 focus:outline-none disabled:opacity-50"

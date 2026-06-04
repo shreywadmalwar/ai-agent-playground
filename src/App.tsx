@@ -70,6 +70,12 @@ export default function App() {
         onStop={stop}
         busy={isBusy}
         disabled={sendableModels.length === 0}
+        disabledReason={
+          // two different ways to end up with zero sendable models — say which one it is
+          MODELS.some((m) => apiKeys[m.id].trim() !== '')
+            ? 'All models are toggled off — click a model pill in the header to enable it'
+            : 'Add an API key in Settings (gear icon) to start chatting…'
+        }
       />
 
       <SettingsPanel
