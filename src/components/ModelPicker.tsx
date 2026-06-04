@@ -36,31 +36,33 @@ export function ModelPicker({
         {MODELS.map((m) => {
           const hasKey = apiKeys[m.id].trim() !== ''
           const on = activeModels[m.id]
+          // Selection reads through elevation, not color: selected cards sit
+          // on a raised surface with a slightly stronger border; unselected
+          // ones recede via opacity. Indigo stays reserved for the CTA —
+          // with most cards selected, accent borders carry no information.
           return (
             <button
               key={m.id}
               onClick={() => onToggle(m.id)}
               className={`flex items-start gap-3 rounded-xl border p-4 text-left transition ${
                 on
-                  ? 'border-indigo-500 bg-indigo-50/50 dark:border-indigo-500 dark:bg-indigo-500/5'
-                  : 'border-zinc-200 hover:border-zinc-300 dark:border-zinc-800 dark:hover:border-zinc-700'
+                  ? 'border-zinc-300 bg-white shadow-sm dark:border-zinc-600 dark:bg-zinc-900'
+                  : 'border-zinc-200 opacity-55 hover:opacity-80 dark:border-zinc-800'
               }`}
             >
               <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${m.accent}`} />
               <span className="min-w-0 flex-1">
                 <span className="block font-medium text-zinc-900 dark:text-zinc-100">{m.label}</span>
                 <span className="block truncate font-mono text-xs text-zinc-500">{m.model}</span>
-                <span
-                  className={`mt-1 block text-xs ${hasKey ? 'text-zinc-500' : 'text-amber-600 dark:text-amber-500'}`}
-                >
+                <span className="mt-1 block text-xs text-zinc-500">
                   {hasKey ? 'key set' : 'no key — add in Settings'}
                 </span>
               </span>
-              {/* checkbox-style state marker, kept quiet */}
+              {/* quiet check, monochrome like everything else */}
               <span
-                className={`mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded border text-xs ${
+                className={`mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded border text-xs transition ${
                   on
-                    ? 'border-indigo-500 bg-indigo-600 text-white'
+                    ? 'border-zinc-400 bg-zinc-100 text-zinc-700 dark:border-zinc-500 dark:bg-zinc-700 dark:text-zinc-100'
                     : 'border-zinc-300 text-transparent dark:border-zinc-700'
                 }`}
               >
@@ -86,9 +88,7 @@ export function ModelPicker({
           Settings
         </button>
         {runnable === 0 && selected > 0 && (
-          <span className="text-sm text-amber-600 dark:text-amber-500">
-            none of the selected models has an API key yet
-          </span>
+          <span className="text-sm text-zinc-500">none of the selected models has an API key yet</span>
         )}
       </div>
     </div>
