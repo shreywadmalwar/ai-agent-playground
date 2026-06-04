@@ -1,15 +1,19 @@
 // Tiny markdown renderer — covers just the bits chat models actually emit:
-// **bold**, `inline code`, and bullet lines. Raw asterisks all over the
-// answers were the single biggest readability problem; a full markdown
-// library is overkill for three patterns.
+// ### headings, **bold**, *italic*, `inline code`, and bullet lines. Raw
+// markdown syntax all over the answers was the single biggest readability
+// problem; a full markdown library is overkill for five patterns.
 
 import type { ReactNode } from 'react'
 
-// Turn **bold** and `code` spans into real elements; leave the rest alone.
+// Turn **bold**, *italic* and `code` spans into real elements.
+// Order matters in the alternation: ** must be tried before * so bold
+// doesn't get half-eaten by the italic rule.
 function renderInline(text: string, keyBase: string): ReactNode[] {
   const out: ReactNode[] = []
-  // non-greedy so "**847 * 392**" (single * inside bold) still matches
-  const re = /(\*\*.+?\*\*|`[^`]+`)/g
+  // bold is non-greedy so "**847 * 392**" (single * inside) still matches;
+  // italic requires non-space right after/before the * so math like
+  // "847 * 392" is never mistaken for emphasis
+  const re = /(\*\*.+?\*\*|`[^`]+`|\*\S(?:[^*]*\S)?\*)/g
   let last = 0
   let i = 0
   let m: RegExpExecArray | null
@@ -22,7 +26,7 @@ function renderInline(text: string, keyBase: string): ReactNode[] {
           {token.slice(2, -2)}
         </strong>,
       )
-    } else {
+    } else if (token.startsWith('`')) {
       out.push(
         <code
           key={`${keyBase}c${i++}`}
@@ -30,6 +34,12 @@ function renderInline(text: string, keyBase: string): ReactNode[] {
         >
           {token.slice(1, -1)}
         </code>,
+      )
+    } else {
+      out.push(
+        <em key={`${keyBase}i${i++}`} className="italic">
+          {token.slice(1, -1)}
+        </em>,
       )
     }
     last = m.index + token.length
@@ -44,6 +54,20 @@ export function Markdown({ content }: { content: string }) {
       {content.split('\n').map((line, i) => {
         // blank line = paragraph break, give it real height
         if (line.trim() === '') return <div key={i} className="h-3" />
+
+        // "### Heading" (any 1-4 hashes) → a real heading line, hashes gone
+        const heading = line.match(/^\s*(#{1,4})\s+(.*)/)
+        if (heading) {
+          return (
+            <div
+              key={i}
+              className="mb-0.5 mt-2 text-[1.05em] font-semibold text-zinc-950 first:mt-0 dark:text-white"
+            >
+              {renderInline(heading[2], String(i))}
+            </div>
+          )
+        }
+
         // "* item" / "- item" → a clean bullet with a hanging indent
         const isBullet = /^\s*[*-]\s+/.test(line)
         const clean = isBullet ? line.replace(/^\s*[*-]\s+/, '') : line
