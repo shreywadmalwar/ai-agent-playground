@@ -1,10 +1,6 @@
-// The whole point of this playground: showing the agentic chain. Each tool
-// call renders as one step — tool name, what went in, what came out — inside
-// a collapsible block so long chains don't bury the actual answer.
-//
-// Readability choices: an amber left-accent marks this as "tool territory" at
-// a glance, step cards sit one elevation level UP from the block (lighter in
-// dark mode, white in light), and code gets generous line height.
+// The agentic chain, monochrome edition: steps separated by hairline
+// dividers instead of colored cards, monospace for data, gray labels.
+// No amber, no rainbow code colors — weight and spacing do the work.
 
 import type { ToolCall } from '../types'
 
@@ -22,43 +18,40 @@ export function ToolCallTrace({ toolCalls }: { toolCalls: ToolCall[] }) {
 
   return (
     <details
-      className="rounded-lg border-l-4 border-amber-400 bg-amber-50 text-sm shadow-sm dark:border-amber-400/80 dark:bg-zinc-800"
+      className="rounded-lg border border-zinc-200 bg-zinc-50 text-sm dark:border-zinc-800 dark:bg-zinc-900/50"
       open={false}
     >
-      <summary className="cursor-pointer select-none rounded-lg px-3 py-2.5 font-semibold text-amber-800 transition hover:bg-amber-100/60 dark:text-amber-300 dark:hover:bg-zinc-700/50">
-        🔧 {toolCalls.length} tool call{toolCalls.length > 1 ? 's' : ''}
-        <span className="ml-2 font-normal text-zinc-600 dark:text-zinc-300">
+      <summary className="cursor-pointer select-none rounded-lg px-3.5 py-2.5 font-medium text-zinc-700 transition hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800/50">
+        Tool calls ({toolCalls.length})
+        <span className="ml-2 font-normal text-zinc-500">
           {/* quick inline summary so you can see the chain without expanding */}
           {toolCalls.map((c) => c.name).join(' → ')}
         </span>
       </summary>
-      <ol className="space-y-2.5 px-3 pb-3">
+      {/* hairline dividers between steps, no nested boxes */}
+      <ol className="divide-y divide-zinc-200 border-t border-zinc-200 dark:divide-zinc-800 dark:border-zinc-800">
         {toolCalls.map((call, i) => (
-          <li
-            key={call.id + i}
-            className="rounded-lg border border-amber-200 bg-white p-3 shadow-sm dark:border-zinc-600 dark:bg-zinc-700/60"
-          >
-            <div className="mb-2 flex items-center justify-between">
-              <span className="font-bold text-amber-700 dark:text-amber-300">
+          <li key={call.id + i} className="px-3.5 py-2.5">
+            <div className="mb-1.5 flex items-baseline justify-between">
+              <span className="font-medium text-zinc-800 dark:text-zinc-200">
                 {i + 1}. {call.name}
                 {/* step = which loop iteration; lets you spot chained reasoning */}
-                <span className="ml-2 font-normal text-zinc-500 dark:text-zinc-400">step {call.step}</span>
+                <span className="ml-2 text-xs font-normal text-zinc-500">step {call.step}</span>
               </span>
-              <span className="text-zinc-500 dark:text-zinc-400">{call.durationMs}ms</span>
+              <span className="text-xs tabular-nums text-zinc-500">{call.durationMs}ms</span>
             </div>
-            <div className="space-y-1.5">
-              {/* code sits on its own darker well so it reads as code */}
-              <div className="rounded-md bg-zinc-100 px-2.5 py-1.5 dark:bg-zinc-900/80">
-                <span className="mr-1 font-medium text-zinc-500 dark:text-zinc-400">input →</span>
-                <code className="whitespace-pre-wrap break-all leading-relaxed text-sky-700 dark:text-sky-300">
+            <div className="space-y-1 font-mono text-[13px] leading-relaxed">
+              <div>
+                <span className="select-none text-zinc-400 dark:text-zinc-500">in&nbsp;&nbsp;→ </span>
+                <span className="whitespace-pre-wrap break-all text-zinc-600 dark:text-zinc-400">
                   {pretty(call.input)}
-                </code>
+                </span>
               </div>
-              <div className="rounded-md bg-zinc-100 px-2.5 py-1.5 dark:bg-zinc-900/80">
-                <span className="mr-1 font-medium text-zinc-500 dark:text-zinc-400">output →</span>
-                <code className="whitespace-pre-wrap break-all leading-relaxed text-emerald-700 dark:text-emerald-300">
+              <div>
+                <span className="select-none text-zinc-400 dark:text-zinc-500">out → </span>
+                <span className="whitespace-pre-wrap break-all text-zinc-700 dark:text-zinc-300">
                   {pretty(call.output)}
-                </code>
+                </span>
               </div>
             </div>
           </li>

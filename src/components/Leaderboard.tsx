@@ -1,5 +1,6 @@
-// All-time stats table inside the shared Modal shell. Data comes from
-// useLeaderboard (localStorage), so it survives reloads until you hit Reset.
+// All-time stats table inside the shared Modal shell. Monochrome: identity
+// dots for the models, tabular numbers, a quiet "fastest" tag instead of a
+// medal emoji.
 
 import { Modal } from './Modal'
 import type { LeaderboardEntry, ProviderId } from '../types'
@@ -27,19 +28,19 @@ export function Leaderboard({
     <Modal
       open={open}
       onClose={onClose}
-      title="🏆 Leaderboard"
+      title="Leaderboard"
       actions={
         <button
           onClick={onReset}
-          className="rounded-lg border border-red-300 px-3 py-1.5 text-sm font-medium text-red-600 transition hover:bg-red-50 dark:border-red-400/40 dark:text-red-400 dark:hover:bg-red-400/10"
+          className="rounded-md border border-zinc-300 px-2.5 py-1 text-sm text-zinc-600 transition hover:border-red-300 hover:text-red-600 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-red-900 dark:hover:text-red-400"
         >
           Reset stats
         </button>
       }
     >
-      <table className="w-full text-left text-base">
+      <table className="w-full text-left text-sm">
         <thead>
-          <tr className="border-b border-zinc-200 text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
+          <tr className="border-b border-zinc-200 text-xs uppercase tracking-wide text-zinc-500 dark:border-zinc-800">
             <th className="py-2 pr-3 font-medium">Model</th>
             <th className="py-2 pr-3 font-medium">Avg response</th>
             <th className="py-2 pr-3 font-medium">Responses</th>
@@ -49,24 +50,31 @@ export function Leaderboard({
         </thead>
         <tbody>
           {rows.map(({ model, entry, avgMs }, i) => (
-            <tr key={model.id} className="border-b border-zinc-100 last:border-0 dark:border-zinc-700/50">
-              <td className={`py-3 pr-3 font-semibold ${model.accent}`}>
-                {/* medal for the fastest model that actually answered */}
-                {i === 0 && avgMs !== Infinity && <span className="mr-1.5">🥇</span>}
-                {model.label}
+            <tr key={model.id} className="border-b border-zinc-100 last:border-0 dark:border-zinc-800/60">
+              <td className="py-3 pr-3">
+                <span className="flex items-center gap-2 font-medium text-zinc-900 dark:text-zinc-100">
+                  <span className={`h-1.5 w-1.5 rounded-full ${model.accent}`} />
+                  {model.label}
+                  {/* quiet tag for the fastest model that actually answered */}
+                  {i === 0 && avgMs !== Infinity && (
+                    <span className="rounded border border-zinc-300 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
+                      fastest
+                    </span>
+                  )}
+                </span>
               </td>
-              <td className="py-3 pr-3 font-medium text-zinc-900 dark:text-zinc-100">
+              <td className="py-3 pr-3 tabular-nums text-zinc-900 dark:text-zinc-100">
                 {avgMs === Infinity ? '—' : `${(avgMs / 1000).toFixed(2)}s`}
               </td>
-              <td className="py-3 pr-3 text-zinc-700 dark:text-zinc-300">{entry.totalResponses}</td>
-              <td className="py-3 pr-3 text-zinc-700 dark:text-zinc-300">{entry.toolCallCount}</td>
-              <td className="py-3 text-zinc-700 dark:text-zinc-300">{entry.sessions}</td>
+              <td className="py-3 pr-3 tabular-nums text-zinc-600 dark:text-zinc-400">{entry.totalResponses}</td>
+              <td className="py-3 pr-3 tabular-nums text-zinc-600 dark:text-zinc-400">{entry.toolCallCount}</td>
+              <td className="py-3 tabular-nums text-zinc-600 dark:text-zinc-400">{entry.sessions}</td>
             </tr>
           ))}
         </tbody>
       </table>
 
-      <p className="mt-4 text-xs text-zinc-500 dark:text-zinc-400">
+      <p className="mt-4 text-xs text-zinc-500">
         Stats accumulate across sessions in localStorage. A session counts once per page load, per model.
       </p>
     </Modal>

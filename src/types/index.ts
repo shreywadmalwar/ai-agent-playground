@@ -46,9 +46,11 @@ export interface ColumnState {
 }
 
 export const MODELS: ModelConfig[] = [
+  // accent = a small muted identity dot, NOT colored text. Text stays
+  // monochrome; the dot is the only hint of brand color.
   // gemini-flash-latest, not gemini-2.0-flash: Google cut free-tier quota to
   // zero on the older model (429 limit:0), the -latest alias still has it.
-  { id: 'gemini', label: 'Gemini Flash (latest)', model: 'gemini-flash-latest', accent: 'text-sky-400' },
-  { id: 'groq', label: 'Groq · Llama 3.3 70B', model: 'llama-3.3-70b-versatile', accent: 'text-orange-400' },
-  { id: 'openai', label: 'OpenAI GPT-4o', model: 'gpt-4o', accent: 'text-emerald-400' },
+  { id: 'gemini', label: 'Gemini Flash (latest)', model: 'gemini-flash-latest', accent: 'bg-sky-400/70' },
+  { id: 'groq', label: 'Groq · Llama 3.3 70B', model: 'llama-3.3-70b-versatile', accent: 'bg-orange-400/70' },
+  { id: 'openai', label: 'OpenAI GPT-4o', model: 'gpt-4o', accent: 'bg-emerald-400/70' },
 ]
