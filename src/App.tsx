@@ -4,7 +4,7 @@
 // With 7+ providers, rendering everything at once stopped making sense;
 // columns now flex to fill the row and scroll horizontally past four.
 
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { MODELS } from './types'
 import { useSettings } from './hooks/useSettings'
 import { useLeaderboard } from './hooks/useLeaderboard'
@@ -22,8 +22,16 @@ export default function App() {
   const { columns, send, stop, clear, isBusy } = useChat(apiKeys, recordResult)
   const { theme, toggleTheme } = useTheme()
 
-  // always land on the picker — choosing the lineup IS the first page
-  const [view, setView] = useState<'picker' | 'compare'>('picker')
+  // The view survives refreshes: mid-conversation reloads land back in the
+  // compare table, not on the landing page. First-time visitors (nothing
+  // stored) start at the picker.
+  const [view, setViewState] = useState<'picker' | 'compare'>(() =>
+    localStorage.getItem('playground:view') === 'compare' ? 'compare' : 'picker',
+  )
+  const setView = useCallback((v: 'picker' | 'compare') => {
+    localStorage.setItem('playground:view', v)
+    setViewState(v)
+  }, [])
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [leaderboardOpen, setLeaderboardOpen] = useState(false)
 
