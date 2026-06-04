@@ -12,12 +12,14 @@ export function ModelPicker({
   apiKeys,
   onCompare,
   onOpenSettings,
+  onOpenAbout,
 }: {
   activeModels: Record<ProviderId, boolean>
   onToggle: (id: ProviderId) => void
   apiKeys: ApiKeys
   onCompare: () => void
   onOpenSettings: () => void
+  onOpenAbout: () => void
 }) {
   // only models with keys can actually answer — count those for the CTA
   const runnable = MODELS.filter((m) => activeModels[m.id] && apiKeys[m.id].trim() !== '').length
@@ -30,6 +32,19 @@ export function ModelPicker({
       </h2>
       <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
         Every selected model gets the same prompt and the same tools — side by side, streaming live.
+      </p>
+      {/* the short pitch; the full story lives on the about page */}
+      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
+        This is a browser-only lab for racing language models head-to-head. Each model can
+        autonomously call tools (calculator, word counter, time, JSON formatter) and the full
+        reasoning chain — which tool, what input, what came back — is shown live in each column. Keys
+        stay in your browser; there's no backend.{' '}
+        <button
+          onClick={onOpenAbout}
+          className="text-zinc-700 underline decoration-zinc-400 underline-offset-2 transition hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100"
+        >
+          Learn more →
+        </button>
       </p>
 
       <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">

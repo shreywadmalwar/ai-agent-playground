@@ -4,7 +4,7 @@
 // With 7+ providers, rendering everything at once stopped making sense;
 // columns now flex to fill the row and scroll horizontally past four.
 
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { MODELS } from './types'
 import { useSettings } from './hooks/useSettings'
 import { useLeaderboard } from './hooks/useLeaderboard'
@@ -12,6 +12,7 @@ import { useChat } from './hooks/useChat'
 import { useTheme } from './hooks/useTheme'
 import { ChatColumn } from './components/ChatColumn'
 import { ModelPicker } from './components/ModelPicker'
+import { About } from './components/About'
 import { SettingsPanel } from './components/SettingsPanel'
 import { MessageInput } from './components/MessageInput'
 import { Leaderboard } from './components/Leaderboard'
@@ -24,13 +25,27 @@ export default function App() {
 
   // The view survives refreshes: mid-conversation reloads land back in the
   // compare table, not on the landing page. First-time visitors (nothing
-  // stored) start at the picker.
-  const [view, setViewState] = useState<'picker' | 'compare'>(() =>
-    localStorage.getItem('playground:view') === 'compare' ? 'compare' : 'picker',
+  // stored) start at the picker. The about page is hash-routed (#/about) so
+  // it's linkable and the browser back button works — no router library
+  // needed for a static GitHub Pages deploy.
+  type View = 'picker' | 'compare' | 'about'
+  const storedView = (): View =>
+    localStorage.getItem('playground:view') === 'compare' ? 'compare' : 'picker'
+  const [view, setViewState] = useState<View>(() =>
+    window.location.hash === '#/about' ? 'about' : storedView(),
   )
-  const setView = useCallback((v: 'picker' | 'compare') => {
-    localStorage.setItem('playground:view', v)
+  const setView = useCallback((v: View) => {
+    if (v !== 'about') localStorage.setItem('playground:view', v)
+    // keep the URL honest; pushes a history entry so Back leaves the about page
+    if (v === 'about' && window.location.hash !== '#/about') window.location.hash = '#/about'
+    if (v !== 'about' && window.location.hash === '#/about') window.location.hash = ''
     setViewState(v)
+  }, [])
+  // browser back/forward between #/about and the app
+  useEffect(() => {
+    const onHash = () => setViewState(window.location.hash === '#/about' ? 'about' : storedView())
+    window.addEventListener('hashchange', onHash)
+    return () => window.removeEventListener('hashchange', onHash)
   }, [])
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [leaderboardOpen, setLeaderboardOpen] = useState(false)
@@ -74,16 +89,24 @@ export default function App() {
           <button onClick={() => setSettingsOpen(true)} title="API keys" className={headerButton}>
             Settings
           </button>
+          {view !== 'about' && (
+            <button onClick={() => setView('about')} title="About this project" className={headerButton}>
+              About
+            </button>
+          )}
         </div>
       </header>
 
-      {view === 'picker' ? (
+      {view === 'about' ? (
+        <About onBack={() => setView(storedView())} />
+      ) : view === 'picker' ? (
         <ModelPicker
           activeModels={activeModels}
           onToggle={toggleModel}
           apiKeys={apiKeys}
           onCompare={() => setView('compare')}
           onOpenSettings={() => setSettingsOpen(true)}
+          onOpenAbout={() => setView('about')}
         />
       ) : (
         <>
