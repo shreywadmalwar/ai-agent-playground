@@ -3,7 +3,7 @@
 // its own agent loop — they stream independently and one failing never
 // touches the others.
 
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ColumnState, Message, ModelConfig, ProviderId, ToolCall } from '../types'
 import { MODELS } from '../types'
 import { runAgentLoop } from '../providers/shared'
@@ -21,6 +21,44 @@ const emptyColumn = (): ColumnState => ({
 })
 
 type Columns = Record<ProviderId, ColumnState>
+
+// Conversations survive a refresh via localStorage. We only persist the
+// finished messages — transient stuff (streaming drafts, status) makes no
+// sense to restore, so every page load starts in a clean idle state with
+// the history intact. Keep the last 50 messages per column so localStorage
+// (~5MB) never fills up from marathon sessions.
+const CHAT_STORAGE = 'playground:conversations'
+const MAX_STORED_MESSAGES = 50
+
+function loadColumns(): Columns {
+  const fresh: Columns = { gemini: emptyColumn(), groq: emptyColumn(), openai: emptyColumn() }
+  try {
+    const raw = localStorage.getItem(CHAT_STORAGE)
+    if (!raw) return fresh
+    const stored = JSON.parse(raw)
+    for (const id of Object.keys(fresh) as ProviderId[]) {
+      if (Array.isArray(stored[id])) fresh[id].messages = stored[id]
+    }
+  } catch {
+    // corrupted storage — just start clean rather than crash the app
+  }
+  return fresh
+}
+
+function saveColumns(columns: Columns) {
+  try {
+    const slim = Object.fromEntries(
+      (Object.keys(columns) as ProviderId[]).map((id) => [
+        id,
+        columns[id].messages.slice(-MAX_STORED_MESSAGES),
+      ]),
+    )
+    localStorage.setItem(CHAT_STORAGE, JSON.stringify(slim))
+  } catch {
+    // quota exceeded or storage unavailable — losing persistence is fine,
+    // breaking the chat is not
+  }
+}
 
 // Picks the right session factory for a model. History only carries the
 // plain user/assistant text — tool chatter from previous turns stays out so
@@ -45,12 +83,16 @@ export function useChat(
   apiKeys: ApiKeys,
   recordResult: (id: ProviderId, timeMs: number, toolCalls: number) => void,
 ) {
-  const [columns, setColumns] = useState<Columns>({
-    gemini: emptyColumn(),
-    groq: emptyColumn(),
-    openai: emptyColumn(),
-  })
+  const [columns, setColumns] = useState<Columns>(loadColumns)
   const abortRef = useRef<AbortController | null>(null)
+
+  // Persist whenever a conversation actually changes. Depending on the
+  // messages arrays (not the whole columns object) means streaming chunks —
+  // which only touch draft state — don't trigger a write per token.
+  useEffect(() => {
+    saveColumns(columns)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [columns.gemini.messages, columns.groq.messages, columns.openai.messages])
 
   // Tiny helper so every state update below stays a one-liner.
   const patch = useCallback((id: ProviderId, updater: (col: ColumnState) => ColumnState) => {
@@ -149,6 +191,7 @@ export function useChat(
   const stop = useCallback(() => abortRef.current?.abort(), [])
 
   const clear = useCallback(() => {
+    localStorage.removeItem(CHAT_STORAGE)
     setColumns({ gemini: emptyColumn(), groq: emptyColumn(), openai: emptyColumn() })
   }, [])
 
