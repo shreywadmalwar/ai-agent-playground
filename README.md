@@ -1,54 +1,45 @@
-# React + TypeScript + Vite
+# ⚡ AI Agent Playground
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+One prompt, three models, live tool traces — side by side.
 
-Currently, two official plugins are available:
+Type a prompt and **Gemini 2.0 Flash**, **Groq (Llama 3.3 70B)**, and **OpenAI GPT-4o** all answer simultaneously. Each model can autonomously call client-side tools, and the UI exposes the full agentic chain: which tools it called, in what order, with what input and output.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## Expanding the ESLint configuration
+- **3-column comparison** — each model streams its answer independently with response times
+- **Autonomous tool use** — models can call: calculator, word counter, current date/time, JSON formatter (all client-side, no backend)
+- **Tool call traces** — collapsible per-response chain showing `tool → input → output → next step`
+- **Leaderboard** — avg response time, tool call counts, and sessions per model, persisted across sessions in localStorage
+- **Bring your own keys** — entered in Settings, stored only in localStorage, sent directly from your browser to each provider. No server anywhere.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Run it
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Open the app, hit ⚙️ Settings, paste your API keys:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- Gemini → [Google AI Studio](https://aistudio.google.com/apikey)
+- Groq → [console.groq.com](https://console.groq.com/keys)
+- OpenAI → [platform.openai.com](https://platform.openai.com/api-keys)
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+Then try a prompt that forces tool use, like:
+
+> What is 847 * 392, how many words are in "the quick brown fox", and what time is it right now?
+
+## Stack
+
+React 18 · Vite 6 · TypeScript · Tailwind CSS v4. Providers are called with plain `fetch` + hand-rolled SSE parsing — no SDKs.
+
+## How the agent loop works
+
 ```
+streamTurn → model responds
+   ├─ plain text only? → done, that's the answer
+   └─ tool calls? → execute locally → append results → streamTurn again
+                    (max 5 iterations)
+```
+
+The loop lives in `src/providers/shared.ts` and is identical for all providers; each provider adapter (`openaiCompatible.ts`, `gemini.ts`) only translates its own wire format.
