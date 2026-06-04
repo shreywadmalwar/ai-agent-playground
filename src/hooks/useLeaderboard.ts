@@ -4,6 +4,7 @@
 
 import { useCallback, useRef, useState } from 'react'
 import type { LeaderboardEntry, ProviderId } from '../types'
+import { MODELS } from '../types'
 
 const STORAGE_KEY = 'playground:leaderboard'
 
@@ -17,11 +18,9 @@ const emptyEntry = (id: ProviderId): LeaderboardEntry => ({
   sessions: 0,
 })
 
-const emptyStats = (): Stats => ({
-  gemini: emptyEntry('gemini'),
-  groq: emptyEntry('groq'),
-  openai: emptyEntry('openai'),
-})
+// Built from MODELS so new providers show up here automatically.
+const emptyStats = (): Stats =>
+  Object.fromEntries(MODELS.map((m) => [m.id, emptyEntry(m.id)])) as Stats
 
 function load(): Stats {
   try {

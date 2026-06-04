@@ -1,0 +1,96 @@
+// The first page: pick which models to race before anything else. Cards
+// show key status at a glance; the compare view only renders what's chosen
+// here, so the layout stays sane no matter how many providers we add.
+
+import type { ProviderId } from '../types'
+import { MODELS } from '../types'
+import type { ApiKeys } from '../hooks/useSettings'
+
+export function ModelPicker({
+  activeModels,
+  onToggle,
+  apiKeys,
+  onCompare,
+  onOpenSettings,
+}: {
+  activeModels: Record<ProviderId, boolean>
+  onToggle: (id: ProviderId) => void
+  apiKeys: ApiKeys
+  onCompare: () => void
+  onOpenSettings: () => void
+}) {
+  // only models with keys can actually answer — count those for the CTA
+  const runnable = MODELS.filter((m) => activeModels[m.id] && apiKeys[m.id].trim() !== '').length
+  const selected = MODELS.filter((m) => activeModels[m.id]).length
+
+  return (
+    <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col justify-center px-6 py-10">
+      <h2 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+        Choose models to compare
+      </h2>
+      <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+        Every selected model gets the same prompt and the same tools — side by side, streaming live.
+      </p>
+
+      <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        {MODELS.map((m) => {
+          const hasKey = apiKeys[m.id].trim() !== ''
+          const on = activeModels[m.id]
+          return (
+            <button
+              key={m.id}
+              onClick={() => onToggle(m.id)}
+              className={`flex items-start gap-3 rounded-xl border p-4 text-left transition ${
+                on
+                  ? 'border-indigo-500 bg-indigo-50/50 dark:border-indigo-500 dark:bg-indigo-500/5'
+                  : 'border-zinc-200 hover:border-zinc-300 dark:border-zinc-800 dark:hover:border-zinc-700'
+              }`}
+            >
+              <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${m.accent}`} />
+              <span className="min-w-0 flex-1">
+                <span className="block font-medium text-zinc-900 dark:text-zinc-100">{m.label}</span>
+                <span className="block truncate font-mono text-xs text-zinc-500">{m.model}</span>
+                <span
+                  className={`mt-1 block text-xs ${hasKey ? 'text-zinc-500' : 'text-amber-600 dark:text-amber-500'}`}
+                >
+                  {hasKey ? 'key set' : 'no key — add in Settings'}
+                </span>
+              </span>
+              {/* checkbox-style state marker, kept quiet */}
+              <span
+                className={`mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded border text-xs ${
+                  on
+                    ? 'border-indigo-500 bg-indigo-600 text-white'
+                    : 'border-zinc-300 text-transparent dark:border-zinc-700'
+                }`}
+              >
+                ✓
+              </span>
+            </button>
+          )
+        })}
+      </div>
+
+      <div className="mt-6 flex items-center gap-3">
+        <button
+          onClick={onCompare}
+          disabled={runnable === 0}
+          className="rounded-lg bg-indigo-600 px-5 py-2.5 text-base font-medium text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          Compare {selected} model{selected === 1 ? '' : 's'} →
+        </button>
+        <button
+          onClick={onOpenSettings}
+          className="rounded-lg border border-zinc-300 px-4 py-2.5 text-sm text-zinc-600 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-900"
+        >
+          Settings
+        </button>
+        {runnable === 0 && selected > 0 && (
+          <span className="text-sm text-amber-600 dark:text-amber-500">
+            none of the selected models has an API key yet
+          </span>
+        )}
+      </div>
+    </div>
+  )
+}

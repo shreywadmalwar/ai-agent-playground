@@ -1,4 +1,11 @@
-export type ProviderId = 'gemini' | 'groq' | 'openai'
+export type ProviderId =
+  | 'gemini'
+  | 'groq'
+  | 'openai'
+  | 'cerebras'
+  | 'openrouter'
+  | 'mistral'
+  | 'cohere'
 
 export interface ToolCall {
   id: string
@@ -53,4 +60,13 @@ export const MODELS: ModelConfig[] = [
   { id: 'gemini', label: 'Gemini Flash (latest)', model: 'gemini-flash-latest', accent: 'bg-sky-400/70' },
   { id: 'groq', label: 'Groq · Llama 3.3 70B', model: 'llama-3.3-70b-versatile', accent: 'bg-orange-400/70' },
   { id: 'openai', label: 'OpenAI GPT-4o', model: 'gpt-4o', accent: 'bg-emerald-400/70' },
+  { id: 'cerebras', label: 'Cerebras · GPT-OSS 120B', model: 'gpt-oss-120b', accent: 'bg-violet-400/70' },
+  {
+    id: 'openrouter',
+    label: 'OpenRouter · Nemotron 3 Ultra',
+    model: 'nvidia/nemotron-3-ultra-550b-a55b:free',
+    accent: 'bg-lime-400/70',
+  },
+  { id: 'mistral', label: 'Mistral Small', model: 'mistral-small-latest', accent: 'bg-rose-400/70' },
+  { id: 'cohere', label: 'Cohere · Command A', model: 'command-a-03-2025', accent: 'bg-teal-400/70' },
 ]

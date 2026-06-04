@@ -1,7 +1,8 @@
-// App shell: header (theme toggle + leaderboard + settings), the three model
-// columns side by side, and the shared input bar at the bottom.
-// Monochrome design language: deep neutral surfaces, hairline borders, type
-// hierarchy — indigo appears ONLY on the primary action and active switches.
+// App shell with two views:
+//   1. picker  — the landing page where you choose which models to race
+//   2. compare — the side-by-side table of ONLY the selected models
+// With 7+ providers, rendering everything at once stopped making sense;
+// columns now flex to fill the row and scroll horizontally past four.
 
 import { useState } from 'react'
 import { MODELS } from './types'
@@ -10,6 +11,7 @@ import { useLeaderboard } from './hooks/useLeaderboard'
 import { useChat } from './hooks/useChat'
 import { useTheme } from './hooks/useTheme'
 import { ChatColumn } from './components/ChatColumn'
+import { ModelPicker } from './components/ModelPicker'
 import { SettingsPanel } from './components/SettingsPanel'
 import { MessageInput } from './components/MessageInput'
 import { Leaderboard } from './components/Leaderboard'
@@ -20,8 +22,12 @@ export default function App() {
   const { columns, send, stop, clear, isBusy } = useChat(apiKeys, recordResult)
   const { theme, toggleTheme } = useTheme()
 
+  // always land on the picker — choosing the lineup IS the first page
+  const [view, setView] = useState<'picker' | 'compare'>('picker')
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [leaderboardOpen, setLeaderboardOpen] = useState(false)
+
+  const selectedModels = MODELS.filter((m) => activeModels[m.id])
 
   // quiet ghost buttons — text does the talking, surface only on hover
   const headerButton =
@@ -33,16 +39,23 @@ export default function App() {
         <h1 className="text-base font-semibold tracking-tight">
           AI Agent Playground
           <span className="ml-3 hidden text-sm font-normal text-zinc-500 lg:inline">
-            one prompt, three models, live tool traces
+            one prompt, many models, live tool traces
           </span>
         </h1>
         <div className="ml-auto flex items-center gap-2">
+          {view === 'compare' && (
+            <button onClick={() => setView('picker')} className={headerButton}>
+              ← Models
+            </button>
+          )}
           <button onClick={toggleTheme} title="Toggle dark/light mode" className={headerButton}>
             {theme === 'dark' ? 'Light' : 'Dark'}
           </button>
-          <button onClick={clear} title="Clear all conversations" className={headerButton}>
-            Clear
-          </button>
+          {view === 'compare' && (
+            <button onClick={clear} title="Clear all conversations" className={headerButton}>
+              Clear
+            </button>
+          )}
           <button onClick={() => setLeaderboardOpen(true)} className={headerButton}>
             Leaderboard
           </button>
@@ -52,38 +65,45 @@ export default function App() {
         </div>
       </header>
 
-      {/* the three columns — stacks on small screens, side by side from md up */}
-      <main className="grid min-h-0 flex-1 grid-cols-1 gap-4 overflow-y-auto p-4 md:grid-cols-3">
-        {MODELS.map((m) => (
-          <ChatColumn
-            key={m.id}
-            model={m}
-            state={columns[m.id]}
-            hasKey={apiKeys[m.id].trim() !== ''}
-            active={activeModels[m.id]}
-            onToggle={() => toggleModel(m.id)}
-          />
-        ))}
-      </main>
+      {view === 'picker' ? (
+        <ModelPicker
+          activeModels={activeModels}
+          onToggle={toggleModel}
+          apiKeys={apiKeys}
+          onCompare={() => setView('compare')}
+          onOpenSettings={() => setSettingsOpen(true)}
+        />
+      ) : (
+        <>
+          {/* selected columns share the row; past ~4 they keep a sane minimum
+              width and the row scrolls horizontally instead of crushing */}
+          <main className="flex min-h-0 flex-1 gap-4 overflow-x-auto p-4">
+            {selectedModels.map((m) => (
+              <div key={m.id} className="flex min-h-0 min-w-80 flex-1">
+                <ChatColumn model={m} state={columns[m.id]} hasKey={apiKeys[m.id].trim() !== ''} />
+              </div>
+            ))}
+          </main>
 
-      <MessageInput
-        onSend={(prompt) =>
-          // only send to models that are toggled on AND have a key
-          send(
-            prompt,
-            sendableModels.map((m) => m.id),
-          )
-        }
-        onStop={stop}
-        busy={isBusy}
-        disabled={sendableModels.length === 0}
-        disabledReason={
-          // two different ways to end up with zero sendable models — say which one it is
-          MODELS.some((m) => apiKeys[m.id].trim() !== '')
-            ? 'All models are switched off — flip a switch in a column header to enable one'
-            : 'Add an API key in Settings to start chatting…'
-        }
-      />
+          <MessageInput
+            onSend={(prompt) =>
+              // only send to models that are selected AND have a key
+              send(
+                prompt,
+                sendableModels.map((m) => m.id),
+              )
+            }
+            onStop={stop}
+            busy={isBusy}
+            disabled={sendableModels.length === 0}
+            disabledReason={
+              MODELS.some((m) => apiKeys[m.id].trim() !== '')
+                ? 'No selected model has an API key — pick models or add keys in Settings'
+                : 'Add an API key in Settings to start chatting…'
+            }
+          />
+        </>
+      )}
 
       <SettingsPanel
         open={settingsOpen}

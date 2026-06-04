@@ -1,5 +1,6 @@
-// Settings live in localStorage: the three API keys plus which models are
-// toggled on. Keys never leave the browser except in the actual API requests.
+// Settings live in localStorage: API keys plus which models are selected
+// for comparison. Keys never leave the browser except in the actual API
+// requests.
 
 import { useCallback, useState } from 'react'
 import type { ProviderId } from '../types'
@@ -20,9 +21,16 @@ const ENV_KEYS: ApiKeys = {
   gemini: import.meta.env.VITE_GEMINI_API_KEY ?? '',
   groq: import.meta.env.VITE_GROQ_API_KEY ?? '',
   openai: import.meta.env.VITE_OPENAI_API_KEY ?? '',
+  cerebras: import.meta.env.VITE_CEREBRAS_API_KEY ?? '',
+  openrouter: import.meta.env.VITE_OPENROUTER_API_KEY ?? '',
+  mistral: import.meta.env.VITE_MISTRAL_API_KEY ?? '',
+  cohere: import.meta.env.VITE_COHERE_API_KEY ?? '',
 }
 
-const EMPTY_KEYS: ApiKeys = { gemini: '', groq: '', openai: '' }
+// Build the empty/default shapes from MODELS so adding a provider is a
+// one-line change in types/index.ts, not a scavenger hunt through hooks.
+const EMPTY_KEYS = Object.fromEntries(MODELS.map((m) => [m.id, ''])) as ApiKeys
+const DEFAULT_ACTIVE = Object.fromEntries(MODELS.map((m) => [m.id, true])) as Record<ProviderId, boolean>
 
 function loadJson<T>(key: string, fallback: T): T {
   try {
@@ -37,14 +45,10 @@ export function useSettings() {
   const [apiKeys, setApiKeysState] = useState<ApiKeys>(() => {
     const stored = loadJson(KEYS_STORAGE, EMPTY_KEYS)
     // env keys only fill the gaps — anything typed in Settings wins
-    return {
-      gemini: stored.gemini || ENV_KEYS.gemini,
-      groq: stored.groq || ENV_KEYS.groq,
-      openai: stored.openai || ENV_KEYS.openai,
-    }
+    return Object.fromEntries(MODELS.map((m) => [m.id, stored[m.id] || ENV_KEYS[m.id]])) as ApiKeys
   })
   const [activeModels, setActiveModelsState] = useState<Record<ProviderId, boolean>>(() =>
-    loadJson(ACTIVE_STORAGE, { gemini: true, groq: true, openai: true }),
+    loadJson(ACTIVE_STORAGE, DEFAULT_ACTIVE),
   )
 
   const setApiKey = useCallback((id: ProviderId, key: string) => {
@@ -63,7 +67,7 @@ export function useSettings() {
     })
   }, [])
 
-  /** Models that are toggled on AND have an API key set. */
+  /** Models that are selected AND have an API key set. */
   const sendableModels = MODELS.filter((m) => activeModels[m.id] && apiKeys[m.id].trim() !== '')
 
   return { apiKeys, setApiKey, activeModels, toggleModel, sendableModels }

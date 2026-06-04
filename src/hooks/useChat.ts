@@ -11,6 +11,10 @@ import type { ProviderSession } from '../providers/shared'
 import { createOpenAiSession } from '../providers/openai'
 import { createGroqSession } from '../providers/groq'
 import { createGeminiSession } from '../providers/gemini'
+import { createCerebrasSession } from '../providers/cerebras'
+import { createOpenRouterSession } from '../providers/openrouter'
+import { createMistralSession } from '../providers/mistral'
+import { createCohereSession } from '../providers/cohere'
 import type { ApiKeys } from './useSettings'
 
 const emptyColumn = (): ColumnState => ({
@@ -22,6 +26,11 @@ const emptyColumn = (): ColumnState => ({
 
 type Columns = Record<ProviderId, ColumnState>
 
+// Build the empty shape from MODELS so adding a provider never touches
+// this file's state plumbing.
+const emptyColumns = (): Columns =>
+  Object.fromEntries(MODELS.map((m) => [m.id, emptyColumn()])) as Columns
+
 // Conversations survive a refresh via localStorage. We only persist the
 // finished messages — transient stuff (streaming drafts, status) makes no
 // sense to restore, so every page load starts in a clean idle state with
@@ -31,7 +40,7 @@ const CHAT_STORAGE = 'playground:conversations'
 const MAX_STORED_MESSAGES = 50
 
 function loadColumns(): Columns {
-  const fresh: Columns = { gemini: emptyColumn(), groq: emptyColumn(), openai: emptyColumn() }
+  const fresh = emptyColumns()
   try {
     const raw = localStorage.getItem(CHAT_STORAGE)
     if (!raw) return fresh
@@ -76,6 +85,14 @@ function createSession(
       return createGroqSession(apiKey, model.model, prompt, history)
     case 'gemini':
       return createGeminiSession(apiKey, model.model, prompt, history)
+    case 'cerebras':
+      return createCerebrasSession(apiKey, model.model, prompt, history)
+    case 'openrouter':
+      return createOpenRouterSession(apiKey, model.model, prompt, history)
+    case 'mistral':
+      return createMistralSession(apiKey, model.model, prompt, history)
+    case 'cohere':
+      return createCohereSession(apiKey, model.model, prompt, history)
   }
 }
 
@@ -86,13 +103,14 @@ export function useChat(
   const [columns, setColumns] = useState<Columns>(loadColumns)
   const abortRef = useRef<AbortController | null>(null)
 
-  // Persist whenever a conversation actually changes. Depending on the
-  // messages arrays (not the whole columns object) means streaming chunks —
-  // which only touch draft state — don't trigger a write per token.
+  // Persist whenever a conversation actually changes. The joined length
+  // signature only moves when some column's messages array changes —
+  // streaming chunks (draft-only updates) never trigger a write.
+  const messagesSignature = MODELS.map((m) => columns[m.id].messages.length).join(',')
   useEffect(() => {
     saveColumns(columns)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [columns.gemini.messages, columns.groq.messages, columns.openai.messages])
+  }, [messagesSignature])
 
   // Tiny helper so every state update below stays a one-liner.
   const patch = useCallback((id: ProviderId, updater: (col: ColumnState) => ColumnState) => {
@@ -192,7 +210,7 @@ export function useChat(
 
   const clear = useCallback(() => {
     localStorage.removeItem(CHAT_STORAGE)
-    setColumns({ gemini: emptyColumn(), groq: emptyColumn(), openai: emptyColumn() })
+    setColumns(emptyColumns())
   }, [])
 
   return { columns, send, stop, clear, isBusy }

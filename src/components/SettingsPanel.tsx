@@ -10,6 +10,10 @@ const KEY_HINTS: Record<ProviderId, string> = {
   gemini: 'Google AI Studio → Get API key',
   groq: 'console.groq.com → API Keys',
   openai: 'platform.openai.com → API keys',
+  cerebras: 'cloud.cerebras.ai → API Keys',
+  openrouter: 'openrouter.ai → Keys',
+  mistral: 'admin.mistral.ai → API keys',
+  cohere: 'dashboard.cohere.com → API keys',
 }
 
 export function SettingsPanel({
