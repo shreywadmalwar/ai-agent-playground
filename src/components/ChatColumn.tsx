@@ -6,6 +6,7 @@
 import { useEffect, useRef } from 'react'
 import type { ColumnState, ModelConfig } from '../types'
 import { ToolCallTrace } from './ToolCallTrace'
+import { Markdown } from './Markdown'
 
 const STATUS_LABEL: Record<ColumnState['status'], string> = {
   idle: '',
@@ -100,9 +101,10 @@ export function ChatColumn({
                 </div>
               ) : msg.content.trim() !== '' ? (
                 // answers: left-aligned, hairline border instead of a fill —
-                // keeps long text calm and readable
-                <div className="mr-8 whitespace-pre-wrap rounded-lg border border-zinc-200 px-3.5 py-2.5 text-base leading-relaxed text-zinc-800 dark:border-zinc-800 dark:text-zinc-200">
-                  {msg.content}
+                // keeps long text calm and readable. Markdown renderer turns
+                // the model's **bold** and bullets into real formatting.
+                <div className="mr-8 rounded-lg border border-zinc-200 px-3.5 py-2.5 text-base leading-relaxed text-zinc-800 dark:border-zinc-800 dark:text-zinc-200">
+                  <Markdown content={msg.content} />
                 </div>
               ) : (
                 // model ran tools but sent no text back — say so instead of
@@ -127,8 +129,8 @@ export function ChatColumn({
           <div className="space-y-2">
             {state.draftToolCalls.length > 0 && <ToolCallTrace toolCalls={state.draftToolCalls} />}
             {state.draft ? (
-              <div className="mr-8 whitespace-pre-wrap rounded-lg border border-zinc-200 px-3.5 py-2.5 text-base leading-relaxed text-zinc-800 dark:border-zinc-800 dark:text-zinc-200">
-                {state.draft}
+              <div className="mr-8 rounded-lg border border-zinc-200 px-3.5 py-2.5 text-base leading-relaxed text-zinc-800 dark:border-zinc-800 dark:text-zinc-200">
+                <Markdown content={state.draft} />
                 <span className="animate-pulse text-zinc-400">▍</span>
               </div>
             ) : (

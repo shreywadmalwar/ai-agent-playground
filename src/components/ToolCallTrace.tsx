@@ -5,7 +5,15 @@
 import type { ToolCall } from '../types'
 
 function pretty(value: unknown): string {
-  if (typeof value === 'string') return value
+  // tool outputs are usually JSON-in-a-string — unpack and indent them so
+  // they read as structure, not as a wall of characters
+  if (typeof value === 'string') {
+    try {
+      return JSON.stringify(JSON.parse(value), null, 2)
+    } catch {
+      return value // plain text output, leave as-is
+    }
+  }
   try {
     return JSON.stringify(value, null, 2)
   } catch {
@@ -40,16 +48,19 @@ export function ToolCallTrace({ toolCalls }: { toolCalls: ToolCall[] }) {
               </span>
               <span className="text-xs tabular-nums text-zinc-500">{call.durationMs}ms</span>
             </div>
+            {/* break-words (not break-all) so wraps land between words and
+                JSON keys never split mid-name; values brightened to match
+                conversation-text contrast */}
             <div className="space-y-1 font-mono text-[13px] leading-relaxed">
               <div>
                 <span className="select-none text-zinc-400 dark:text-zinc-500">in&nbsp;&nbsp;→ </span>
-                <span className="whitespace-pre-wrap break-all text-zinc-600 dark:text-zinc-400">
+                <span className="whitespace-pre-wrap break-words text-zinc-700 dark:text-zinc-300">
                   {pretty(call.input)}
                 </span>
               </div>
               <div>
                 <span className="select-none text-zinc-400 dark:text-zinc-500">out → </span>
-                <span className="whitespace-pre-wrap break-all text-zinc-700 dark:text-zinc-300">
+                <span className="whitespace-pre-wrap break-words text-zinc-800 dark:text-zinc-200">
                   {pretty(call.output)}
                 </span>
               </div>
