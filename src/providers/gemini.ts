@@ -13,6 +13,10 @@ interface GeminiPart {
   text?: string
   functionCall?: { name: string; args: Record<string, unknown> }
   functionResponse?: { name: string; response: Record<string, unknown> }
+  // Thinking models sign their parts; the API REJECTS replayed functionCall
+  // parts that are missing their signature ("missing thought_signature" 400),
+  // so we have to capture these and echo them back verbatim.
+  thoughtSignature?: string
 }
 
 interface GeminiContent {
@@ -41,6 +45,12 @@ export function createGeminiSession(
     { role: 'user', parts: [{ text: userPrompt }] },
   ]
 
+  // Signatures captured during the last streamTurn, keyed by our generated
+  // call id (plus one for the text part). appendAssistantTurn reads these —
+  // both live in this closure, so no need to widen the shared types.
+  let lastCallSignatures = new Map<string, string>()
+  let lastTextSignature: string | undefined
+
   return {
     async streamTurn(signal, onTextChunk) {
       // alt=sse makes Gemini stream Server-Sent Events instead of a JSON array.
@@ -62,6 +72,8 @@ export function createGeminiSession(
 
       let text = ''
       const toolCalls: RequestedToolCall[] = []
+      lastCallSignatures = new Map()
+      lastTextSignature = undefined
 
       await readSse(response, (payload) => {
         const chunk = JSON.parse(payload)
@@ -73,12 +85,15 @@ export function createGeminiSession(
           if (typeof part.text === 'string' && part.text !== '') {
             text += part.text
             onTextChunk(part.text)
+            if (part.thoughtSignature) lastTextSignature = part.thoughtSignature
           }
           if (part.functionCall) {
+            // Gemini doesn't assign call ids, so we make one up — only our
+            // UI uses it, the API matches responses by function name.
+            const id = `gemini_${toolCalls.length}_${part.functionCall.name}`
+            if (part.thoughtSignature) lastCallSignatures.set(id, part.thoughtSignature)
             toolCalls.push({
-              // Gemini doesn't assign call ids, so we make one up — only our
-              // UI uses it, the API matches responses by function name.
-              id: `gemini_${toolCalls.length}_${part.functionCall.name}`,
+              id,
               name: part.functionCall.name,
               args: part.functionCall.args ?? {},
             })
@@ -92,10 +107,15 @@ export function createGeminiSession(
     appendAssistantTurn(turn: TurnResult) {
       // Replay the model's turn into history: its text (if any) plus the
       // functionCall parts it made, so the functionResponses line up next.
+      // Each part carries its captured thoughtSignature — without these the
+      // API rejects the request with a "missing thought_signature" 400.
       const parts: GeminiPart[] = []
-      if (turn.text) parts.push({ text: turn.text })
+      if (turn.text) parts.push({ text: turn.text, thoughtSignature: lastTextSignature })
       for (const call of turn.toolCalls) {
-        parts.push({ functionCall: { name: call.name, args: call.args } })
+        parts.push({
+          functionCall: { name: call.name, args: call.args },
+          thoughtSignature: lastCallSignatures.get(call.id),
+        })
       }
       contents.push({ role: 'model', parts })
     },

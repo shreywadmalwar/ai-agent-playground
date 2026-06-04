@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* class-based dark mode: dark: variants apply when <html> has .dark
+   (toggled by useTheme) instead of following the OS setting */
+@custom-variant dark (&:where(.dark, .dark *));
+
 html, body, #root {
   height: 100%;
 }
