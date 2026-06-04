@@ -1,5 +1,12 @@
+// The four client-side tools every model can call. Each one is dead simple
+// and runs entirely in the browser — the point isn't the tools themselves,
+// it's watching HOW each model decides to use them.
+
 import { evaluateExpression } from './calculator'
 
+// We describe parameters in plain JSON Schema once, then convert to each
+// provider's flavor below (OpenAI wraps it in {type:'function'}, Gemini
+// wants functionDeclarations).
 interface JsonSchemaProperty {
   type: string
   description: string
@@ -92,7 +99,9 @@ export const TOOLS: ToolDefinition[] = [
 
 const toolMap = new Map(TOOLS.map((t) => [t.name, t]))
 
-/** Runs a tool by name; errors are returned as a string so the model can recover. */
+// Runs a tool by name. Errors come back as a STRING instead of throwing —
+// that way the model sees "Error: division by zero" and can correct itself
+// on the next turn instead of the whole chat blowing up.
 export function executeTool(name: string, args: Record<string, unknown>): string {
   const tool = toolMap.get(name)
   if (!tool) return `Error: unknown tool "${name}"`

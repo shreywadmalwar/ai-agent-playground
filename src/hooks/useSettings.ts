@@ -1,3 +1,6 @@
+// Settings live in localStorage: the three API keys plus which models are
+// toggled on. Keys never leave the browser except in the actual API requests.
+
 import { useCallback, useState } from 'react'
 import type { ProviderId } from '../types'
 import { MODELS } from '../types'
