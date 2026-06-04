@@ -27,7 +27,7 @@ export const TOOLS: ToolDefinition[] = [
   {
     name: 'calculator',
     description:
-      'Evaluates a math expression and returns the numeric result. Supports + - * / % ^ and parentheses. Example: "2^10 + (3 * -4)"',
+      'Evaluates a math expression and returns the numeric result. Supports + - * / % ^ parentheses, and the functions sqrt, abs, round, floor, ceil, log, ln. Example: "sqrt(2^10) + abs(3 * -4)"',
     parameters: {
       type: 'object',
       properties: {

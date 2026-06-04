@@ -185,7 +185,15 @@ export function useChat(
         } catch (err) {
           // Aborts are the user clicking Stop — not an error worth shouting about.
           const aborted = err instanceof DOMException && err.name === 'AbortError'
-          const message = aborted ? 'Stopped' : err instanceof Error ? err.message : String(err)
+          // Browsers surface dropped streams as cryptic TypeErrors ("Load
+          // failed" / "Failed to fetch") — translate to something actionable.
+          const message = aborted
+            ? 'Stopped'
+            : err instanceof TypeError
+              ? `${model.label}: connection lost mid-stream — the provider may be busy or rate-limiting. Try sending again.`
+              : err instanceof Error
+                ? err.message
+                : String(err)
           patch(id, (col) => ({
             ...col,
             status: aborted ? 'idle' : 'error',
