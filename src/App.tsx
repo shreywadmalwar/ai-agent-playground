@@ -60,8 +60,12 @@ export default function App() {
             {theme === 'dark' ? 'Light' : 'Dark'}
           </button>
           {view === 'compare' && (
-            <button onClick={clear} title="Clear all conversations" className={headerButton}>
-              Clear
+            <button
+              onClick={clear}
+              title="Start a fresh session — clears all conversations (keys and stats are kept)"
+              className={headerButton}
+            >
+              New chat
             </button>
           )}
           <button onClick={() => setLeaderboardOpen(true)} className={headerButton}>
@@ -104,7 +108,12 @@ export default function App() {
           >
             {selectedModels.map((m) => (
               <div key={m.id} className="flex min-h-96 md:min-h-0">
-                <ChatColumn model={m} state={columns[m.id]} hasKey={apiKeys[m.id].trim() !== ''} />
+                <ChatColumn
+                  model={m}
+                  state={columns[m.id]}
+                  hasKey={apiKeys[m.id].trim() !== ''}
+                  onRemove={() => toggleModel(m.id)}
+                />
               </div>
             ))}
           </main>

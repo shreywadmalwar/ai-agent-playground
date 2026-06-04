@@ -19,10 +19,12 @@ export function ChatColumn({
   model,
   state,
   hasKey,
+  onRemove,
 }: {
   model: ModelConfig
   state: ColumnState
   hasKey: boolean
+  onRemove: () => void // drop this model from the comparison without leaving the page
 }) {
   const scrollRef = useRef<HTMLDivElement>(null)
 
@@ -46,6 +48,15 @@ export function ChatColumn({
         >
           {STATUS_LABEL[state.status]}
         </span>
+        {/* quiet remove — drops the column right here, no round-trip to the picker */}
+        <button
+          onClick={onRemove}
+          title={`Remove ${model.label} from this comparison`}
+          aria-label={`Remove ${model.label}`}
+          className="shrink-0 rounded-md px-1.5 py-0.5 text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-700 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+        >
+          ✕
+        </button>
       </header>
 
       <div ref={scrollRef} className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
