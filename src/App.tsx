@@ -75,11 +75,27 @@ export default function App() {
         />
       ) : (
         <>
-          {/* selected columns share the row; past ~4 they keep a sane minimum
-              width and the row scrolls horizontally instead of crushing */}
-          <main className="flex min-h-0 flex-1 gap-4 overflow-x-auto p-4">
+          {/* count-aware grid: up to 3 models share one row; 4 becomes 2x2;
+              5-6 becomes 3x2; 7+ becomes 4x2. Everything stays visible at
+              once — no horizontal scrolling, no cut-off columns. On small
+              screens it stacks vertically with a sane minimum height. */}
+          <main
+            className={`grid min-h-0 flex-1 grid-cols-1 gap-4 overflow-y-auto p-4 ${
+              selectedModels.length <= 1
+                ? 'md:grid-cols-1'
+                : selectedModels.length === 2
+                  ? 'md:grid-cols-2'
+                  : selectedModels.length === 3
+                    ? 'md:grid-cols-3'
+                    : selectedModels.length === 4
+                      ? 'md:grid-cols-2 md:grid-rows-2'
+                      : selectedModels.length <= 6
+                        ? 'md:grid-cols-3 md:grid-rows-2'
+                        : 'md:grid-cols-4 md:grid-rows-2'
+            }`}
+          >
             {selectedModels.map((m) => (
-              <div key={m.id} className="flex min-h-0 min-w-80 flex-1">
+              <div key={m.id} className="flex min-h-96 md:min-h-0">
                 <ChatColumn model={m} state={columns[m.id]} hasKey={apiKeys[m.id].trim() !== ''} />
               </div>
             ))}
