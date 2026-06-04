@@ -46,7 +46,9 @@ export interface ColumnState {
 }
 
 export const MODELS: ModelConfig[] = [
-  { id: 'gemini', label: 'Gemini 2.0 Flash', model: 'gemini-2.0-flash', accent: 'text-sky-400' },
+  // gemini-flash-latest, not gemini-2.0-flash: Google cut free-tier quota to
+  // zero on the older model (429 limit:0), the -latest alias still has it.
+  { id: 'gemini', label: 'Gemini Flash (latest)', model: 'gemini-flash-latest', accent: 'text-sky-400' },
   { id: 'groq', label: 'Groq · Llama 3.3 70B', model: 'llama-3.3-70b-versatile', accent: 'text-orange-400' },
   { id: 'openai', label: 'OpenAI GPT-4o', model: 'gpt-4o', accent: 'text-emerald-400' },
 ]
