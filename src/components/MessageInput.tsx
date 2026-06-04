@@ -30,7 +30,7 @@ export function MessageInput({
   return (
     // items-stretch + self-stretch on the button = button height always
     // matches the textarea, even when the user drags it taller
-    <div className="flex items-stretch gap-2 border-t border-zinc-300 bg-zinc-50 p-3 dark:border-zinc-800 dark:bg-zinc-950">
+    <div className="flex items-stretch gap-2 border-t border-zinc-200 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-800">
       <textarea
         value={value}
         onChange={(e) => setValue(e.target.value)}
@@ -46,12 +46,12 @@ export function MessageInput({
           disabled ? disabledReason : 'Ask all active models… (Enter to send, Shift+Enter for newline)'
         }
         disabled={disabled}
-        className="min-h-[3.5rem] flex-1 resize-y rounded-lg border border-zinc-300 bg-white px-3 py-2 text-base text-zinc-900 placeholder:text-zinc-400 focus:border-indigo-500 focus:outline-none disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder:text-zinc-600"
+        className="min-h-[3.5rem] flex-1 resize-y rounded-lg border border-zinc-300 bg-zinc-50 px-3.5 py-2.5 text-base text-zinc-900 placeholder:text-zinc-400 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30 disabled:opacity-50 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:bg-zinc-900"
       />
       {busy ? (
         <button
           onClick={onStop}
-          className="self-stretch rounded-lg bg-red-600 px-5 text-base font-medium text-white hover:bg-red-500"
+          className="self-stretch rounded-lg bg-red-600 px-5 text-base font-semibold text-white shadow-sm transition hover:bg-red-500"
         >
           Stop
         </button>
@@ -59,7 +59,7 @@ export function MessageInput({
         <button
           onClick={submit}
           disabled={disabled || !value.trim()}
-          className="self-stretch rounded-lg bg-indigo-600 px-5 text-base font-medium text-white hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-40"
+          className="self-stretch rounded-lg bg-indigo-600 px-5 text-base font-semibold text-white shadow-sm transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-40"
         >
           Send
         </button>

@@ -22,15 +22,17 @@ export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [leaderboardOpen, setLeaderboardOpen] = useState(false)
 
+  // page is zinc-900 in dark (NOT 950/black — pure black kills shadows and
+  // halates text); header buttons get a visible surface on hover
   const headerButton =
-    'rounded-md border border-zinc-300 px-2.5 py-1.5 text-sm text-zinc-700 hover:bg-zinc-200 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800'
+    'rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium text-zinc-700 shadow-sm transition hover:bg-zinc-50 hover:text-zinc-900 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700 dark:hover:text-white'
 
   return (
-    <div className="flex h-full flex-col bg-zinc-100 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
-      <header className="flex flex-wrap items-center gap-3 border-b border-zinc-300 px-4 py-3 dark:border-zinc-800">
+    <div className="flex h-full flex-col bg-zinc-100 text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100">
+      <header className="flex flex-wrap items-center gap-3 border-b border-zinc-200 bg-white px-4 py-3 dark:border-zinc-700 dark:bg-zinc-800">
         <h1 className="text-base font-bold tracking-wide">
           ⚡ AI Agent Playground
-          <span className="ml-2 hidden font-normal text-zinc-500 lg:inline">
+          <span className="ml-2 hidden font-normal text-zinc-500 dark:text-zinc-400 lg:inline">
             one prompt, three models, live tool traces
           </span>
         </h1>
