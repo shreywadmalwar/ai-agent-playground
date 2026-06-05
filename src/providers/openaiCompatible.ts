@@ -1,5 +1,5 @@
 // Groq copied OpenAI's chat-completions API almost exactly, so one implementation
-// covers both providers — we just swap the base URL and model name.
+// covers both providers - we just swap the base URL and model name.
 // This file handles the tricky part: streaming + tool calls at the same time.
 
 import type { ProviderSession, RequestedToolCall, TurnResult } from './shared'
@@ -20,7 +20,7 @@ interface OpenAiMessage {
 }
 
 const SYSTEM_PROMPT =
-  'You are a helpful assistant. You have tools available — use them whenever they help you answer accurately (math, counting, current time, JSON formatting) instead of guessing.'
+  'You are a helpful assistant. You have tools available - use them whenever they help you answer accurately (math, counting, current time, JSON formatting) instead of guessing.'
 
 export function createOpenAiCompatibleSession(opts: {
   baseUrl: string // e.g. https://api.openai.com or https://api.groq.com/openai
@@ -68,13 +68,13 @@ export function createOpenAiCompatibleSession(opts: {
         const delta = chunk.choices?.[0]?.delta
         if (!delta) return
 
-        // Plain text tokens — stream them straight to the UI.
+        // Plain text tokens - stream them straight to the UI.
         if (typeof delta.content === 'string' && delta.content !== '') {
           text += delta.content
           onTextChunk(delta.content)
         }
 
-        // Tool call fragments — accumulate until the stream ends.
+        // Tool call fragments - accumulate until the stream ends.
         if (Array.isArray(delta.tool_calls)) {
           for (const fragment of delta.tool_calls) {
             const idx: number = fragment.index ?? 0
@@ -87,7 +87,7 @@ export function createOpenAiCompatibleSession(opts: {
         }
       })
 
-      // Stream is done — now the accumulated argument strings are complete
+      // Stream is done - now the accumulated argument strings are complete
       // JSON, safe to parse. A malformed one becomes {} so the tool can at
       // least respond with its own error instead of crashing the loop.
       const toolCalls: RequestedToolCall[] = [...pending.entries()]
@@ -97,7 +97,7 @@ export function createOpenAiCompatibleSession(opts: {
           try {
             args = entry.argsJson ? JSON.parse(entry.argsJson) : {}
           } catch {
-            // leave args empty — executeTool will surface a useful error
+            // leave args empty - executeTool will surface a useful error
           }
           return { id: entry.id || `call_${idx}`, name: entry.name, args }
         })
@@ -106,7 +106,7 @@ export function createOpenAiCompatibleSession(opts: {
     },
 
     appendAssistantTurn(turn: TurnResult) {
-      // Echo the model's own turn back into history, tool calls included —
+      // Echo the model's own turn back into history, tool calls included -
       // the API requires this so the upcoming role:'tool' messages have
       // something to attach to.
       messages.push({

@@ -4,7 +4,7 @@
  * No eval / new Function.
  */
 
-// Functions models actually reach for — Cohere tried sqrt(8900989) and gave
+// Functions models actually reach for - Cohere tried sqrt(8900989) and gave
 // up when we rejected it, so meet the models where they are.
 const FUNCTIONS: Record<string, (x: number) => number> = {
   sqrt: Math.sqrt,
@@ -84,7 +84,7 @@ export function evaluateExpression(expr: string): number {
       consume()
       return value
     }
-    // function call like sqrt(...) — read the identifier, then a parenthesized arg
+    // function call like sqrt(...) - read the identifier, then a parenthesized arg
     if (/[a-z]/i.test(peek() ?? '')) {
       const start = pos
       while (pos < input.length && /[a-z]/i.test(input[pos])) pos++

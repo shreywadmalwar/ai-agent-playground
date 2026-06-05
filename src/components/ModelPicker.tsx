@@ -21,7 +21,7 @@ export function ModelPicker({
   onOpenSettings: () => void
   onOpenAbout: () => void
 }) {
-  // only models with keys can actually answer — count those for the CTA
+  // only models with keys can actually answer - count those for the CTA
   const runnable = MODELS.filter((m) => activeModels[m.id] && apiKeys[m.id].trim() !== '').length
   const selected = MODELS.filter((m) => activeModels[m.id]).length
 
@@ -31,13 +31,13 @@ export function ModelPicker({
         Choose models to compare
       </h2>
       <p className="mt-2 text-base text-zinc-500 dark:text-zinc-400">
-        Every selected model gets the same prompt and the same tools — side by side, streaming live.
+        Every selected model gets the same prompt and the same tools - side by side, streaming live.
       </p>
       {/* the short pitch; the full story lives on the about page */}
       <p className="mt-3 max-w-2xl text-base leading-relaxed text-zinc-500 dark:text-zinc-400">
         This is a browser-only lab for racing language models head-to-head. Each model can
         autonomously call tools (calculator, word counter, time, JSON formatter) and the full
-        reasoning chain — which tool, what input, what came back — is shown live in each column. Keys
+        reasoning chain - which tool, what input, what came back - is shown live in each column. Keys
         stay in your browser; there's no backend.{' '}
         <button
           onClick={onOpenAbout}
@@ -53,9 +53,9 @@ export function ModelPicker({
           const on = activeModels[m.id]
           // Selection reads through elevation, not color: selected cards sit
           // on a raised surface with a solid border; unselected ones read as
-          // empty slots — dashed border, heavier fade, and even the identity
+          // empty slots - dashed border, heavier fade, and even the identity
           // dot goes grey so nothing on the card looks "live". Indigo stays
-          // reserved for the CTA — with most cards selected, accent borders
+          // reserved for the CTA - with most cards selected, accent borders
           // carry no information.
           return (
             <button
@@ -74,7 +74,7 @@ export function ModelPicker({
                 <span className="block font-medium text-zinc-900 dark:text-zinc-100">{m.label}</span>
                 <span className="block truncate font-mono text-xs text-zinc-500">{m.model}</span>
                 <span className="mt-1 block text-xs text-zinc-500">
-                  {hasKey ? 'Key set' : 'No key — add in Settings'}
+                  {hasKey ? 'Key set' : 'No key - add in Settings'}
                 </span>
               </span>
               {/* quiet check, monochrome like everything else */}

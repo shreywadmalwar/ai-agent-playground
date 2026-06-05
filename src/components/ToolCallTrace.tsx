@@ -1,11 +1,11 @@
 // The agentic chain, monochrome edition: steps separated by hairline
 // dividers instead of colored cards, monospace for data, gray labels.
-// No amber, no rainbow code colors — weight and spacing do the work.
+// No amber, no rainbow code colors - weight and spacing do the work.
 
 import type { ToolCall } from '../types'
 
 function pretty(value: unknown): string {
-  // tool outputs are usually JSON-in-a-string — unpack and indent them so
+  // tool outputs are usually JSON-in-a-string - unpack and indent them so
   // they read as structure, not as a wall of characters
   if (typeof value === 'string') {
     try {

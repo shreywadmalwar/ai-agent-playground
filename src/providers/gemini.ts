@@ -1,13 +1,13 @@
 // Gemini speaks a different dialect than OpenAI: conversation lives in
 // `contents` with user/model roles, tool calls come back as `functionCall`
 // parts, and tool results go back as `functionResponse` parts inside a
-// user-role message. Same agentic loop though — only the wire format differs.
+// user-role message. Same agentic loop though - only the wire format differs.
 
 import type { ProviderSession, RequestedToolCall, TurnResult } from './shared'
 import { readSse, throwHttpError } from './shared'
 import { toGeminiTools } from '../tools'
 
-// A Gemini "part" is one piece of a message — plain text, a tool call the
+// A Gemini "part" is one piece of a message - plain text, a tool call the
 // model wants to make, or a tool result we're sending back.
 interface GeminiPart {
   text?: string
@@ -25,7 +25,7 @@ interface GeminiContent {
 }
 
 const SYSTEM_PROMPT =
-  'You are a helpful assistant. You have tools available — use them whenever they help you answer accurately (math, counting, current time, JSON formatting) instead of guessing.'
+  'You are a helpful assistant. You have tools available - use them whenever they help you answer accurately (math, counting, current time, JSON formatting) instead of guessing.'
 
 export function createGeminiSession(
   apiKey: string,
@@ -46,7 +46,7 @@ export function createGeminiSession(
   ]
 
   // Signatures captured during the last streamTurn, keyed by our generated
-  // call id (plus one for the text part). appendAssistantTurn reads these —
+  // call id (plus one for the text part). appendAssistantTurn reads these -
   // both live in this closure, so no need to widen the shared types.
   let lastCallSignatures = new Map<string, string>()
   let lastTextSignature: string | undefined
@@ -77,7 +77,7 @@ export function createGeminiSession(
 
       await readSse(response, (payload) => {
         const chunk = JSON.parse(payload)
-        // Each SSE chunk carries candidate parts — text streams in pieces,
+        // Each SSE chunk carries candidate parts - text streams in pieces,
         // functionCalls usually arrive whole (no fragment-stitching needed,
         // unlike OpenAI).
         const parts: GeminiPart[] = chunk.candidates?.[0]?.content?.parts ?? []
@@ -88,7 +88,7 @@ export function createGeminiSession(
             if (part.thoughtSignature) lastTextSignature = part.thoughtSignature
           }
           if (part.functionCall) {
-            // Gemini doesn't assign call ids, so we make one up — only our
+            // Gemini doesn't assign call ids, so we make one up - only our
             // UI uses it, the API matches responses by function name.
             const id = `gemini_${toolCalls.length}_${part.functionCall.name}`
             if (part.thoughtSignature) lastCallSignatures.set(id, part.thoughtSignature)
@@ -107,7 +107,7 @@ export function createGeminiSession(
     appendAssistantTurn(turn: TurnResult) {
       // Replay the model's turn into history: its text (if any) plus the
       // functionCall parts it made, so the functionResponses line up next.
-      // Each part carries its captured thoughtSignature — without these the
+      // Each part carries its captured thoughtSignature - without these the
       // API rejects the request with a "missing thought_signature" 400.
       const parts: GeminiPart[] = []
       if (turn.text) parts.push({ text: turn.text, thoughtSignature: lastTextSignature })

@@ -1,4 +1,4 @@
-// Cohere — exposes an OpenAI-compatible layer at /compatibility/v1, so the
+// Cohere - exposes an OpenAI-compatible layer at /compatibility/v1, so the
 // shared session works as-is. Command A is their flagship; trial keys are
 // free with rate limits.
 import { createOpenAiCompatibleSession } from './openaiCompatible'

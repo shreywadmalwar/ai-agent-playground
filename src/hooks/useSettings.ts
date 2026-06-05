@@ -13,7 +13,7 @@ export type ApiKeys = Record<ProviderId, string>
 
 // Keys can come from two places, in priority order:
 //   1. what you typed in the Settings panel (localStorage)
-//   2. a local .env.local file (VITE_*_API_KEY) — handy for dev so you don't
+//   2. a local .env.local file (VITE_*_API_KEY) - handy for dev so you don't
 //      retype keys after clearing storage. .env.local is gitignored, so keys
 //      never land on GitHub. (Remember: VITE_ vars get baked into the bundle,
 //      so never ship a public build with keys in .env.local.)
@@ -44,7 +44,7 @@ function loadJson<T>(key: string, fallback: T): T {
 export function useSettings() {
   const [apiKeys, setApiKeysState] = useState<ApiKeys>(() => {
     const stored = loadJson(KEYS_STORAGE, EMPTY_KEYS)
-    // env keys only fill the gaps — anything typed in Settings wins
+    // env keys only fill the gaps - anything typed in Settings wins
     return Object.fromEntries(MODELS.map((m) => [m.id, stored[m.id] || ENV_KEYS[m.id]])) as ApiKeys
   })
   const [activeModels, setActiveModelsState] = useState<Record<ProviderId, boolean>>(() =>

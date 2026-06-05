@@ -1,5 +1,5 @@
 // One column = one model. Monochrome design: hierarchy comes from type
-// weight, spacing, and hairline borders — not color. The only color in a
+// weight, spacing, and hairline borders - not color. The only color in a
 // column is the model's tiny identity dot and the single indigo accent on
 // the active switch.
 
@@ -48,7 +48,7 @@ export function ChatColumn({
         >
           {STATUS_LABEL[state.status]}
         </span>
-        {/* quiet remove — drops the column right here, no round-trip to the picker */}
+        {/* quiet remove - drops the column right here, no round-trip to the picker */}
         <button
           onClick={onRemove}
           title={`Remove ${model.label} from this comparison`}
@@ -85,17 +85,17 @@ export function ChatColumn({
                   {msg.error}
                 </div>
               ) : msg.content.trim() !== '' ? (
-                // answers: left-aligned, hairline border instead of a fill —
+                // answers: left-aligned, hairline border instead of a fill -
                 // keeps long text calm and readable. Markdown renderer turns
                 // the model's **bold** and bullets into real formatting.
                 <div className="mr-8 rounded-lg border border-zinc-200 px-3.5 py-2.5 text-base leading-relaxed text-zinc-800 dark:border-zinc-800 dark:text-zinc-200">
                   <Markdown content={msg.content} />
                 </div>
               ) : (
-                // model ran tools but sent no text back — say so instead of
+                // model ran tools but sent no text back - say so instead of
                 // rendering a confusing empty bubble
                 <p className="text-sm italic text-zinc-500 dark:text-zinc-400">
-                  (no text in response — see tool calls above)
+                  (no text in response - see tool calls above)
                 </p>
               )}
               {msg.responseTimeMs !== undefined && (

@@ -1,4 +1,4 @@
-// Groq — same OpenAI-compatible API, different host. Their OpenAI-flavored
+// Groq - same OpenAI-compatible API, different host. Their OpenAI-flavored
 // endpoints live under the /openai path prefix.
 import { createOpenAiCompatibleSession } from './openaiCompatible'
 import type { ProviderSession } from './shared'

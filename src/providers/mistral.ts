@@ -1,4 +1,4 @@
-// Mistral — OpenAI-compatible API at api.mistral.ai. mistral-small-latest
+// Mistral - OpenAI-compatible API at api.mistral.ai. mistral-small-latest
 // is on the free tier and supports tool calling.
 import { createOpenAiCompatibleSession } from './openaiCompatible'
 import type { ProviderSession } from './shared'

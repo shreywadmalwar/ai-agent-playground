@@ -1,5 +1,5 @@
 // The four client-side tools every model can call. Each one is dead simple
-// and runs entirely in the browser — the point isn't the tools themselves,
+// and runs entirely in the browser - the point isn't the tools themselves,
 // it's watching HOW each model decides to use them.
 
 import { evaluateExpression } from './calculator'
@@ -99,7 +99,7 @@ export const TOOLS: ToolDefinition[] = [
 
 const toolMap = new Map(TOOLS.map((t) => [t.name, t]))
 
-// Runs a tool by name. Errors come back as a STRING instead of throwing —
+// Runs a tool by name. Errors come back as a STRING instead of throwing -
 // that way the model sees "Error: division by zero" and can correct itself
 // on the next turn instead of the whole chat blowing up.
 export function executeTool(name: string, args: Record<string, unknown>): string {

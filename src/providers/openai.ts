@@ -1,4 +1,4 @@
-// OpenAI — just the OpenAI-compatible session pointed at api.openai.com.
+// OpenAI - just the OpenAI-compatible session pointed at api.openai.com.
 import { createOpenAiCompatibleSession } from './openaiCompatible'
 import type { ProviderSession } from './shared'
 

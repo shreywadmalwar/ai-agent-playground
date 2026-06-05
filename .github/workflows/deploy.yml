@@ -2,7 +2,7 @@
 #
 # API keys come from GitHub Actions secrets (repo Settings → Secrets and
 # variables → Actions), injected as env vars at build time. They still end
-# up in the public JS bundle — that's unavoidable on a static host — but
+# up in the public JS bundle - that's unavoidable on a static host - but
 # they never touch git history, so rotating a key is just updating the
 # secret and re-running the workflow.
 
@@ -18,7 +18,7 @@ permissions:
   pages: write
   id-token: write
 
-# Don't pile up deploys — a new push cancels the in-flight one.
+# Don't pile up deploys - a new push cancels the in-flight one.
 concurrency:
   group: pages
   cancel-in-progress: true
@@ -40,7 +40,7 @@ jobs:
         env:
           # Only ship the keys you're comfortable making public.
           # Gemini: referrer-restrict it in Google Cloud Console first.
-          # OpenAI is intentionally absent — paid keys must never ship;
+          # OpenAI is intentionally absent - paid keys must never ship;
           # visitors enter their own via the Settings panel.
           VITE_GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           VITE_GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}

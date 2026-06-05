@@ -1,6 +1,6 @@
 // The conductor: one send() fans the prompt out to every active model at
 // once. Each model gets its own column state, its own provider session, and
-// its own agent loop — they stream independently and one failing never
+// its own agent loop - they stream independently and one failing never
 // touches the others.
 
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -32,7 +32,7 @@ const emptyColumns = (): Columns =>
   Object.fromEntries(MODELS.map((m) => [m.id, emptyColumn()])) as Columns
 
 // Conversations survive a refresh via localStorage. We only persist the
-// finished messages — transient stuff (streaming drafts, status) makes no
+// finished messages - transient stuff (streaming drafts, status) makes no
 // sense to restore, so every page load starts in a clean idle state with
 // the history intact. Keep the last 50 messages per column so localStorage
 // (~5MB) never fills up from marathon sessions.
@@ -49,7 +49,7 @@ function loadColumns(): Columns {
       if (Array.isArray(stored[id])) fresh[id].messages = stored[id]
     }
   } catch {
-    // corrupted storage — just start clean rather than crash the app
+    // corrupted storage - just start clean rather than crash the app
   }
   return fresh
 }
@@ -64,13 +64,13 @@ function saveColumns(columns: Columns) {
     )
     localStorage.setItem(CHAT_STORAGE, JSON.stringify(slim))
   } catch {
-    // quota exceeded or storage unavailable — losing persistence is fine,
+    // quota exceeded or storage unavailable - losing persistence is fine,
     // breaking the chat is not
   }
 }
 
 // Picks the right session factory for a model. History only carries the
-// plain user/assistant text — tool chatter from previous turns stays out so
+// plain user/assistant text - tool chatter from previous turns stays out so
 // each new prompt starts with a clean, compact context.
 function createSession(
   model: ModelConfig,
@@ -104,7 +104,7 @@ export function useChat(
   const abortRef = useRef<AbortController | null>(null)
 
   // Persist whenever a conversation actually changes. The joined length
-  // signature only moves when some column's messages array changes —
+  // signature only moves when some column's messages array changes -
   // streaming chunks (draft-only updates) never trigger a write.
   const messagesSignature = MODELS.map((m) => columns[m.id].messages.length).join(',')
   useEffect(() => {
@@ -183,14 +183,14 @@ export function useChat(
           }))
           recordResult(id, elapsed, result.toolCalls.length)
         } catch (err) {
-          // Aborts are the user clicking Stop — not an error worth shouting about.
+          // Aborts are the user clicking Stop - not an error worth shouting about.
           const aborted = err instanceof DOMException && err.name === 'AbortError'
           // Browsers surface dropped streams as cryptic TypeErrors ("Load
-          // failed" / "Failed to fetch") — translate to something actionable.
+          // failed" / "Failed to fetch") - translate to something actionable.
           const message = aborted
             ? 'Stopped'
             : err instanceof TypeError
-              ? `${model.label}: connection lost mid-stream — the provider may be busy or rate-limiting. Try sending again.`
+              ? `${model.label}: connection lost mid-stream - the provider may be busy or rate-limiting. Try sending again.`
               : err instanceof Error
                 ? err.message
                 : String(err)

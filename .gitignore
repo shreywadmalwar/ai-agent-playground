@@ -23,7 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 
-# env files — API keys live here, NEVER commit these
+# env files - API keys live here, NEVER commit these
 .env
 .env.*
 !.env.example

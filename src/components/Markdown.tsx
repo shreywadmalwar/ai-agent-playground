@@ -1,4 +1,4 @@
-// Tiny markdown renderer — covers just the bits chat models actually emit:
+// Tiny markdown renderer - covers just the bits chat models actually emit:
 // ### headings, **bold**, *italic*, `inline code`, and bullet lines. Raw
 // markdown syntax all over the answers was the single biggest readability
 // problem; a full markdown library is overkill for five patterns.

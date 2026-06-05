@@ -1,6 +1,6 @@
 // The heart of the playground: a provider-agnostic agent loop.
 // Each provider (OpenAI, Groq, Gemini) only knows how to stream ONE turn and
-// how to append messages in its own wire format — this file does the rest:
+// how to append messages in its own wire format - this file does the rest:
 // run a turn, execute whatever tools the model asked for, feed results back,
 // and repeat until the model gives a plain-text answer.
 
@@ -62,7 +62,7 @@ export async function runAgentLoop(
     const turn = await session.streamTurn(signal, callbacks.onTextChunk)
     finalText += turn.text
 
-    // No tool calls means the model is done thinking — this text is the answer.
+    // No tool calls means the model is done thinking - this text is the answer.
     if (turn.toolCalls.length === 0) {
       return { text: finalText, toolCalls: allToolCalls }
     }
@@ -93,7 +93,7 @@ export async function runAgentLoop(
     // the model so it can either answer or chain another tool.
   }
 
-  // Safety valve — a model stuck in a tool-calling loop stops here instead
+  // Safety valve - a model stuck in a tool-calling loop stops here instead
   // of burning API credits forever.
   return {
     text: finalText + '\n\n_(stopped: max tool iterations reached)_',

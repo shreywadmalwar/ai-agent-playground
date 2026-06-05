@@ -71,7 +71,7 @@ export function Leaderboard({
                 </span>
               </td>
               <td className="py-3 pr-3 tabular-nums text-zinc-900 dark:text-zinc-100">
-                {avgMs === Infinity ? '—' : `${(avgMs / 1000).toFixed(2)}s`}
+                {avgMs === Infinity ? '-' : `${(avgMs / 1000).toFixed(2)}s`}
               </td>
               <td className="py-3 pr-3 tabular-nums text-zinc-600 dark:text-zinc-400">{entry.totalResponses}</td>
               <td className="py-3 pr-3 tabular-nums text-zinc-600 dark:text-zinc-400">{entry.toolCallCount}</td>
@@ -82,7 +82,7 @@ export function Leaderboard({
       </table>
 
       {/* Two quiet bar charts under the table: speed and tool-call appetite.
-          Pure CSS — a chart library would be absurd for a handful of divs.
+          Pure CSS - a chart library would be absurd for a handful of divs.
           Bars stay zinc; the identity dots are the only color, same as the
           table above. */}
       {answered.length > 0 && (

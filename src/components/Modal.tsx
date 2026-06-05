@@ -1,7 +1,7 @@
 // Shared modal shell so Settings and Leaderboard look and behave identically.
 // Elevation on dark themes can't come from shadows alone (shadows vanish on
 // dark backgrounds), so we stack three cues: a surface lighter than the page,
-// a faint light ring around the edge, and a deep shadow — plus a blurred,
+// a faint light ring around the edge, and a deep shadow - plus a blurred,
 // dimmed backdrop to push the page back.
 
 import type { ReactNode } from 'react'
@@ -34,7 +34,7 @@ export function Modal({
           <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">{title}</h2>
           <div className="flex items-center gap-2">
             {actions}
-            {/* a real button with a visible boundary — not a floating × */}
+            {/* a real button with a visible boundary - not a floating × */}
             <button
               onClick={onClose}
               aria-label="Close"

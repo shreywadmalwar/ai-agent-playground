@@ -1,4 +1,4 @@
-// Cerebras — another OpenAI-compatible API, famous for very fast inference.
+// Cerebras - another OpenAI-compatible API, famous for very fast inference.
 // gpt-oss-120b also streams `reasoning` deltas (it thinks out loud); our
 // parser only reads content/tool_calls, so the reasoning is simply skipped.
 import { createOpenAiCompatibleSession } from './openaiCompatible'

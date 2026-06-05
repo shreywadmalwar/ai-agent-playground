@@ -54,7 +54,7 @@ export function useLeaderboard() {
           totalTimeMs: entry.totalTimeMs + Math.round(timeMs),
           toolCallCount: entry.toolCallCount + toolCalls,
           // First response from this model since the page loaded counts as
-          // one session — refreshing and answering again counts a new one.
+          // one session - refreshing and answering again counts a new one.
           sessions: entry.sessions + (sessionCounted.current.has(id) ? 0 : 1),
         },
       }

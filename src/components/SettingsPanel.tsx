@@ -1,4 +1,4 @@
-// API key settings. A centered modal, not a flyout — three inputs don't need
+// API key settings. A centered modal, not a flyout - three inputs don't need
 // a full-height panel, and a modal keeps the eye in one place.
 
 import { Modal } from './Modal'
@@ -30,7 +30,7 @@ export function SettingsPanel({
   return (
     <Modal open={open} onClose={onClose} title="API Keys">
       <p className="mb-5 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
-        Keys are stored only in your browser's localStorage and sent directly to each provider — no
+        Keys are stored only in your browser's localStorage and sent directly to each provider - no
         backend involved.
       </p>
 

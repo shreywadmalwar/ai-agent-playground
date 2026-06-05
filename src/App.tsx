@@ -1,6 +1,6 @@
 // App shell with two views:
-//   1. picker  — the landing page where you choose which models to race
-//   2. compare — the side-by-side table of ONLY the selected models
+//   1. picker  - the landing page where you choose which models to race
+//   2. compare - the side-by-side table of ONLY the selected models
 // With 7+ providers, rendering everything at once stopped making sense;
 // columns now flex to fill the row and scroll horizontally past four.
 
@@ -26,7 +26,7 @@ export default function App() {
   // The view survives refreshes: mid-conversation reloads land back in the
   // compare table, not on the landing page. First-time visitors (nothing
   // stored) start at the picker. The about page is hash-routed (#/about) so
-  // it's linkable and the browser back button works — no router library
+  // it's linkable and the browser back button works - no router library
   // needed for a static GitHub Pages deploy.
   type View = 'picker' | 'compare' | 'about'
   const storedView = (): View =>
@@ -52,7 +52,7 @@ export default function App() {
 
   const selectedModels = MODELS.filter((m) => activeModels[m.id])
 
-  // quiet ghost buttons — text does the talking, surface only on hover
+  // quiet ghost buttons - text does the talking, surface only on hover
   const headerButton =
     'rounded-md border border-zinc-200 px-3 py-1.5 text-sm text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-100'
 
@@ -77,7 +77,7 @@ export default function App() {
           {view === 'compare' && (
             <button
               onClick={clear}
-              title="Start a fresh session — clears all conversations (keys and stats are kept)"
+              title="Start a fresh session - clears all conversations (keys and stats are kept)"
               className={headerButton}
             >
               New chat
@@ -112,7 +112,7 @@ export default function App() {
         <>
           {/* count-aware grid: up to 3 models share one row; 4 becomes 2x2;
               5-6 becomes 3x2; 7+ becomes 4x2. Everything stays visible at
-              once — no horizontal scrolling, no cut-off columns. On small
+              once - no horizontal scrolling, no cut-off columns. On small
               screens it stacks vertically with a sane minimum height. */}
           <main
             className={`grid min-h-0 flex-1 grid-cols-1 gap-4 overflow-y-auto p-4 ${
@@ -154,7 +154,7 @@ export default function App() {
             disabled={sendableModels.length === 0}
             disabledReason={
               MODELS.some((m) => apiKeys[m.id].trim() !== '')
-                ? 'No selected model has an API key — pick models or add keys in Settings'
+                ? 'No selected model has an API key - pick models or add keys in Settings'
                 : 'Add an API key in Settings to start chatting…'
             }
           />
