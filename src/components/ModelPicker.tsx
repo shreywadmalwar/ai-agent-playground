@@ -27,14 +27,14 @@ export function ModelPicker({
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col justify-center px-6 py-10">
-      <h2 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+      <h2 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
         Choose models to compare
       </h2>
-      <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+      <p className="mt-2 text-base text-zinc-500 dark:text-zinc-400">
         Every selected model gets the same prompt and the same tools — side by side, streaming live.
       </p>
       {/* the short pitch; the full story lives on the about page */}
-      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
+      <p className="mt-3 max-w-2xl text-base leading-relaxed text-zinc-500 dark:text-zinc-400">
         This is a browser-only lab for racing language models head-to-head. Each model can
         autonomously call tools (calculator, word counter, time, JSON formatter) and the full
         reasoning chain — which tool, what input, what came back — is shown live in each column. Keys
@@ -52,25 +52,29 @@ export function ModelPicker({
           const hasKey = apiKeys[m.id].trim() !== ''
           const on = activeModels[m.id]
           // Selection reads through elevation, not color: selected cards sit
-          // on a raised surface with a slightly stronger border; unselected
-          // ones recede via opacity. Indigo stays reserved for the CTA —
-          // with most cards selected, accent borders carry no information.
+          // on a raised surface with a solid border; unselected ones read as
+          // empty slots — dashed border, heavier fade, and even the identity
+          // dot goes grey so nothing on the card looks "live". Indigo stays
+          // reserved for the CTA — with most cards selected, accent borders
+          // carry no information.
           return (
             <button
               key={m.id}
               onClick={() => onToggle(m.id)}
               className={`flex items-start gap-3 rounded-xl border p-4 text-left transition ${
                 on
-                  ? 'border-zinc-300 bg-white shadow-sm dark:border-zinc-600 dark:bg-zinc-900'
-                  : 'border-zinc-200 opacity-55 hover:opacity-80 dark:border-zinc-800'
+                  ? 'border-zinc-300 bg-white shadow-sm dark:border-zinc-500 dark:bg-zinc-900'
+                  : 'border-dashed border-zinc-300 opacity-40 hover:opacity-70 dark:border-zinc-700'
               }`}
             >
-              <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${m.accent}`} />
+              <span
+                className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${on ? m.accent : 'bg-zinc-400 dark:bg-zinc-600'}`}
+              />
               <span className="min-w-0 flex-1">
                 <span className="block font-medium text-zinc-900 dark:text-zinc-100">{m.label}</span>
                 <span className="block truncate font-mono text-xs text-zinc-500">{m.model}</span>
                 <span className="mt-1 block text-xs text-zinc-500">
-                  {hasKey ? 'key set' : 'no key — add in Settings'}
+                  {hasKey ? 'Key set' : 'No key — add in Settings'}
                 </span>
               </span>
               {/* quiet check, monochrome like everything else */}
@@ -103,7 +107,7 @@ export function ModelPicker({
           Settings
         </button>
         {runnable === 0 && selected > 0 && (
-          <span className="text-sm text-zinc-500">none of the selected models has an API key yet</span>
+          <span className="text-sm text-zinc-500">None of the selected models has an API key yet.</span>
         )}
       </div>
     </div>

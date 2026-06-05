@@ -24,6 +24,13 @@ export function Leaderboard({
     return { model: m, entry: s, avgMs }
   }).sort((a, b) => a.avgMs - b.avgMs)
 
+  // Bar charts only make sense for models that have actually answered; the
+  // max of each metric sets the 100% mark so the longest bar always fills
+  // the track and the rest read as proportions of it.
+  const answered = rows.filter((r) => r.avgMs !== Infinity)
+  const maxAvg = Math.max(...answered.map((r) => r.avgMs), 1)
+  const maxCalls = Math.max(...answered.map((r) => r.entry.toolCallCount), 1)
+
   return (
     <Modal
       open={open}
@@ -73,6 +80,54 @@ export function Leaderboard({
           ))}
         </tbody>
       </table>
+
+      {/* Two quiet bar charts under the table: speed and tool-call appetite.
+          Pure CSS — a chart library would be absurd for a handful of divs.
+          Bars stay zinc; the identity dots are the only color, same as the
+          table above. */}
+      {answered.length > 0 && (
+        <div className="mt-6 grid gap-6 border-t border-zinc-200 pt-5 sm:grid-cols-2 dark:border-zinc-800">
+          {(
+            [
+              {
+                heading: 'Avg response',
+                value: (r: (typeof answered)[number]) => r.avgMs,
+                max: maxAvg,
+                format: (v: number) => `${(v / 1000).toFixed(2)}s`,
+              },
+              {
+                heading: 'Tool calls',
+                value: (r: (typeof answered)[number]) => r.entry.toolCallCount,
+                max: maxCalls,
+                format: (v: number) => String(v),
+              },
+            ] as const
+          ).map(({ heading, value, max, format }) => (
+            <div key={heading}>
+              <h3 className="text-xs font-medium uppercase tracking-wide text-zinc-500">{heading}</h3>
+              <div className="mt-3 space-y-2.5">
+                {answered.map((r) => (
+                  <div key={r.model.id} className="flex items-center gap-2">
+                    <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${r.model.accent}`} />
+                    <span className="w-28 truncate text-xs text-zinc-600 dark:text-zinc-400">
+                      {r.model.label}
+                    </span>
+                    <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+                      <div
+                        className="h-full rounded-full bg-zinc-400 transition-[width] dark:bg-zinc-500"
+                        style={{ width: `${(value(r) / max) * 100}%` }}
+                      />
+                    </div>
+                    <span className="w-12 shrink-0 text-right text-xs tabular-nums text-zinc-600 dark:text-zinc-400">
+                      {format(value(r))}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       <p className="mt-4 text-xs text-zinc-500">
         Stats accumulate across sessions in localStorage. A session counts once per page load, per model.

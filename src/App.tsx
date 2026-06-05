@@ -62,7 +62,7 @@ export default function App() {
         <h1 className="text-base font-semibold tracking-tight">
           AI Agent Playground
           <span className="ml-3 hidden text-sm font-normal text-zinc-500 lg:inline">
-            one prompt, many models, live tool traces
+            One prompt, many models, live tool traces
           </span>
         </h1>
         <div className="ml-auto flex items-center gap-2">
