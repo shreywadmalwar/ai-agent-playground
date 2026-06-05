@@ -97,6 +97,9 @@ export default function App() {
         </div>
       </header>
 
+      {/* key={view} remounts this wrapper on navigation, replaying the
+          view-in animation; flex column so each view keeps its own sizing */}
+      <div key={view} className="view-transition flex min-h-0 flex-1 flex-col">
       {view === 'about' ? (
         <About onBack={() => setView(storedView())} />
       ) : view === 'picker' ? (
@@ -160,6 +163,7 @@ export default function App() {
           />
         </>
       )}
+      </div>
 
       <SettingsPanel
         open={settingsOpen}

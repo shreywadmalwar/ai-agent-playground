@@ -7,3 +7,56 @@
 html, body, #root {
   height: 100%;
 }
+
+/* Apple-style view transition: content rises a touch and settles with the
+   iOS sheet curve - fast start, long gentle landing. Re-triggered by React
+   remounting the keyed view wrapper on navigation. Kept subtle (12px, no
+   bounce) so switching views feels physical, not showy. */
+@keyframes view-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.view-transition {
+  animation: view-in 0.45s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+/* Modals: backdrop fades while the panel scales up from 96% - the macOS
+   sheet feel. Slightly quicker than view transitions; dialogs should snap. */
+@keyframes backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.modal-backdrop {
+  animation: backdrop-in 0.25s ease-out both;
+}
+.modal-panel {
+  animation: panel-in 0.35s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+/* People who ask the OS for less motion get a plain crossfade. */
+@media (prefers-reduced-motion: reduce) {
+  @keyframes view-in {
+    from { opacity: 0; transform: none; }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes panel-in {
+    from { opacity: 0; transform: none; }
+    to { opacity: 1; transform: none; }
+  }
+}

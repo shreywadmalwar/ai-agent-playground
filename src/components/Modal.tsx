@@ -25,11 +25,11 @@ export function Modal({
 
   return (
     <div
-      className="fixed inset-0 z-40 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+      className="modal-backdrop fixed inset-0 z-40 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
-        className={`w-full ${wide ? 'max-w-5xl' : 'max-w-2xl'} max-h-[90vh] overflow-y-auto rounded-xl bg-white shadow-2xl shadow-zinc-400/20 ring-1 ring-zinc-200 dark:bg-zinc-900 dark:shadow-black/60 dark:ring-zinc-700/80`}
+        className={`modal-panel w-full ${wide ? 'max-w-5xl' : 'max-w-2xl'} max-h-[90vh] overflow-y-auto rounded-xl bg-white shadow-2xl shadow-zinc-400/20 ring-1 ring-zinc-200 dark:bg-zinc-900 dark:shadow-black/60 dark:ring-zinc-700/80`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4 dark:border-zinc-800">
