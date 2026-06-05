@@ -124,7 +124,7 @@ export function About({ onBack }: { onBack: () => void }) {
               React 18 · Vite · TypeScript · Tailwind CSS v4. Providers are called with plain{' '}
               <code className="rounded bg-zinc-200/70 px-1 font-mono text-[0.9em] dark:bg-zinc-800">fetch</code>{' '}
               and hand-rolled SSE parsing - no provider SDKs, which keeps the bundle small and the
-              streaming logic honest. Built by Shreyash with Claude Code.
+              streaming logic honest. Built by Shreyash.
             </p>
           </Section>
         </div>
