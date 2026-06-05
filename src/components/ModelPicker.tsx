@@ -53,10 +53,10 @@ export function ModelPicker({
           const on = activeModels[m.id]
           // Selection reads through elevation, not color: selected cards sit
           // on a raised surface with a solid border; unselected ones read as
-          // empty slots - dashed border, heavier fade, and even the identity
-          // dot goes grey so nothing on the card looks "live". Indigo stays
-          // reserved for the CTA - with most cards selected, accent borders
-          // carry no information.
+          // empty slots - dashed border, grey identity dot, empty checkbox.
+          // Only a whisper of fade: anything heavier made the text unreadable
+          // on the dark background. Indigo stays reserved for the CTA - with
+          // most cards selected, accent borders carry no information.
           return (
             <button
               key={m.id}
@@ -64,7 +64,7 @@ export function ModelPicker({
               className={`flex items-start gap-3 rounded-xl border p-4 text-left transition ${
                 on
                   ? 'border-zinc-300 bg-white shadow-sm dark:border-zinc-500 dark:bg-zinc-900'
-                  : 'border-dashed border-zinc-300 opacity-65 hover:opacity-85 dark:border-zinc-700'
+                  : 'border-dashed border-zinc-300 opacity-85 hover:opacity-100 dark:border-zinc-700'
               }`}
             >
               <span
