@@ -109,7 +109,7 @@ export function Leaderboard({
                 {answered.map((r) => (
                   <div key={r.model.id} className="flex items-center gap-2">
                     <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${r.model.accent}`} />
-                    <span className="w-28 truncate text-xs text-zinc-600 dark:text-zinc-400">
+                    <span className="w-48 truncate text-sm text-zinc-700 dark:text-zinc-300">
                       {r.model.label}
                     </span>
                     <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
