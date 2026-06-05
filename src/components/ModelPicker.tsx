@@ -64,7 +64,7 @@ export function ModelPicker({
               className={`flex items-start gap-3 rounded-xl border p-4 text-left transition ${
                 on
                   ? 'border-zinc-300 bg-white shadow-sm dark:border-zinc-500 dark:bg-zinc-900'
-                  : 'border-dashed border-zinc-300 opacity-40 hover:opacity-70 dark:border-zinc-700'
+                  : 'border-dashed border-zinc-300 opacity-65 hover:opacity-85 dark:border-zinc-700'
               }`}
             >
               <span
