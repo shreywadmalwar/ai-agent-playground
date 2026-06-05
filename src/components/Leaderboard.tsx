@@ -36,6 +36,7 @@ export function Leaderboard({
       open={open}
       onClose={onClose}
       title="Leaderboard"
+      wide
       actions={
         <button
           onClick={onReset}
