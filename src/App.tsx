@@ -52,9 +52,11 @@ export default function App() {
 
   const selectedModels = MODELS.filter((m) => activeModels[m.id])
 
-  // quiet ghost buttons - text does the talking, surface only on hover
+  // raised buttons - a light grey fill lifts them off the header, and a hairline
+  // white inset along the top edge fakes a catch-light so they read as slightly
+  // embossed. still monochrome zinc, just one surface step up instead of flat.
   const headerButton =
-    'rounded-md border border-zinc-200 px-3 py-1.5 text-sm text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-100'
+    'rounded-md border border-zinc-200 bg-zinc-100 px-3 py-1.5 text-sm text-zinc-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_1px_2px_rgba(0,0,0,0.05)] transition hover:bg-zinc-200/70 hover:text-zinc-900 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_1px_2px_rgba(0,0,0,0.4)] dark:hover:bg-zinc-800 dark:hover:text-zinc-100'
 
   return (
     <div className="flex h-full flex-col bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
