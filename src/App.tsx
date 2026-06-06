@@ -49,6 +49,9 @@ export default function App() {
   }, [])
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [leaderboardOpen, setLeaderboardOpen] = useState(false)
+  // phone header collapses everything but "back" into one overflow menu -
+  // wrapping six pills into two rows ate a third of the screen
+  const [menuOpen, setMenuOpen] = useState(false)
 
   const selectedModels = MODELS.filter((m) => activeModels[m.id])
 
@@ -74,17 +77,16 @@ export default function App() {
 
   return (
     <div className="flex h-full flex-col bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
-      <header className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-zinc-200 px-4 py-3 sm:px-5 dark:border-zinc-800">
-        <h1 className="text-base font-semibold tracking-tight">
+      <header className="relative flex items-center gap-3 border-b border-zinc-200 px-4 py-3 sm:px-5 dark:border-zinc-800">
+        <h1 className="truncate text-base font-semibold tracking-tight">
           AI Agent Playground
           <span className="ml-3 hidden text-sm font-normal text-zinc-500 lg:inline">
             One prompt, many models, live tool traces
           </span>
         </h1>
-        {/* on narrow screens the buttons drop to their own full-width block
-            and wrap into tidy rows - sideways scrolling hid Settings/About
-            past the right edge with nothing hinting they existed */}
-        <div className="ml-auto flex w-full flex-wrap items-center gap-2 sm:w-auto sm:flex-nowrap">
+
+        {/* desktop: the full button row, exactly as before */}
+        <div className="ml-auto hidden items-center gap-2 sm:flex">
           {view === 'compare' && (
             <button onClick={() => setView('picker')} className={headerButton}>
               ← Models
@@ -114,6 +116,54 @@ export default function App() {
             </button>
           )}
         </div>
+
+        {/* phones: back stays inline (it's the one navigational action),
+            everything else lives behind one overflow button so the header
+            never grows past a single line */}
+        <div className="ml-auto flex items-center gap-2 sm:hidden">
+          {view === 'compare' && (
+            <button onClick={() => setView('picker')} className={headerButton}>
+              ← Models
+            </button>
+          )}
+          <button
+            onClick={() => setMenuOpen((o) => !o)}
+            aria-label="Menu"
+            aria-expanded={menuOpen}
+            className={headerButton}
+          >
+            ⋯
+          </button>
+        </div>
+
+        {menuOpen && (
+          <>
+            {/* invisible backdrop: any tap outside the menu dismisses it */}
+            <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
+            <div className="absolute right-4 top-full z-20 mt-1 w-44 rounded-lg border border-zinc-200 bg-white py-1 shadow-lg sm:hidden dark:border-zinc-800 dark:bg-zinc-900">
+              {(
+                [
+                  [theme === 'dark' ? 'Light mode' : 'Dark mode', toggleTheme],
+                  ...(view === 'compare' ? ([['New chat', clear]] as const) : []),
+                  ['Leaderboard', () => setLeaderboardOpen(true)],
+                  ['Settings', () => setSettingsOpen(true)],
+                  ...(view !== 'about' ? ([['About', () => setView('about')]] as const) : []),
+                ] as const
+              ).map(([label, action]) => (
+                <button
+                  key={label}
+                  onClick={() => {
+                    setMenuOpen(false)
+                    action()
+                  }}
+                  className="block w-full px-4 py-2.5 text-left text-sm text-zinc-700 transition hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
       </header>
 
       {/* key={view} remounts this wrapper on navigation, replaying the
