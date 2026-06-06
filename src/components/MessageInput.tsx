@@ -6,6 +6,13 @@
 
 import { useState } from 'react'
 
+// Touch devices have no Enter-to-send convention and no Shift key worth
+// mentioning - the keyboard-shortcut placeholder was desktop copy wrapping
+// onto two lines. Pointer capability is fixed per device, so reading it
+// once at module load is enough.
+const COARSE_POINTER =
+  typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
+
 export function MessageInput({
   onSend,
   onStop,
@@ -31,8 +38,10 @@ export function MessageInput({
   return (
     // items-stretch + self-stretch on the button = button height always
     // matches the textarea, even when the user drags it taller
-    // p-3 on phones buys the textarea some room; p-4 from sm up as before
-    <div className="flex items-stretch gap-2 border-t border-zinc-200 p-3 sm:p-4 dark:border-zinc-800">
+    // p-3 on phones buys the textarea some room; p-4 from sm up as before.
+    // The bottom edge respects the safe-area inset so the bar doesn't sit
+    // flush against the home indicator on notched phones.
+    <div className="flex items-stretch gap-2 border-t border-zinc-200 p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:p-4 sm:pb-4 dark:border-zinc-800">
       <textarea
         value={value}
         onChange={(e) => setValue(e.target.value)}
@@ -45,15 +54,23 @@ export function MessageInput({
         }}
         rows={2}
         placeholder={
-          disabled ? disabledReason : 'Ask all active models… (Enter to send, Shift+Enter for newline)'
+          disabled
+            ? disabledReason
+            : COARSE_POINTER
+              ? 'Ask all active models…'
+              : 'Ask all active models… (Enter to send, Shift+Enter for newline)'
         }
         disabled={disabled}
         className="min-h-[3.5rem] flex-1 resize-y rounded-lg border border-zinc-300 bg-white px-3.5 py-2.5 text-base text-zinc-900 placeholder:text-zinc-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder:text-zinc-500"
       />
+      {/* on phones the button sits compact at the textarea's bottom edge -
+          stretched to full height it became a huge indigo slab, and indigo
+          is the one accent in the app so it dominated the screen. From sm
+          up it stretches to match the textarea as before. */}
       {busy ? (
         <button
           onClick={onStop}
-          className="self-stretch rounded-lg border border-zinc-300 px-5 text-base font-medium text-zinc-700 transition hover:border-red-300 hover:text-red-600 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-red-900 dark:hover:text-red-400"
+          className="self-end rounded-lg border border-zinc-300 px-4 py-3 text-base font-medium text-zinc-700 transition hover:border-red-300 hover:text-red-600 sm:self-stretch sm:px-5 sm:py-0 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-red-900 dark:hover:text-red-400"
         >
           Stop
         </button>
@@ -61,7 +78,7 @@ export function MessageInput({
         <button
           onClick={submit}
           disabled={disabled || !value.trim()}
-          className="self-stretch rounded-lg bg-indigo-600 px-5 text-base font-medium text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-40"
+          className="self-end rounded-lg bg-indigo-600 px-4 py-3 text-base font-medium text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-40 sm:self-stretch sm:px-5 sm:py-0"
         >
           Send
         </button>

@@ -20,11 +20,13 @@ export function ChatColumn({
   state,
   hasKey,
   onRemove,
+  headerHiddenOnMobile = false,
 }: {
   model: ModelConfig
   state: ColumnState
   hasKey: boolean
   onRemove: () => void // drop this model from the comparison without leaving the page
+  headerHiddenOnMobile?: boolean // true when the mobile tab strip already names this model
 }) {
   const scrollRef = useRef<HTMLDivElement>(null)
 
@@ -39,8 +41,12 @@ export function ChatColumn({
   return (
     <section className="flex min-h-0 w-full flex-col rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
       {/* column header: identity dot + model name + live status. Selection
-          happens on the picker page now, so no switch here. */}
-      <header className="flex items-center gap-2.5 border-b border-zinc-200 px-4 py-3 dark:border-zinc-800">
+          happens on the picker page now, so no switch here. On phones the
+          tab strip already shows the dot, name, and status - repeating them
+          here wasted 50px, so the header only renders from md up. */}
+      <header
+        className={`${headerHiddenOnMobile ? 'hidden md:flex' : 'flex'} items-center gap-2.5 border-b border-zinc-200 px-4 py-3 dark:border-zinc-800`}
+      >
         <span className={`h-2 w-2 shrink-0 rounded-full ${model.accent}`} />
         <h2 className="truncate text-base font-medium text-zinc-900 dark:text-zinc-100">{model.label}</h2>
         <span
@@ -53,7 +59,9 @@ export function ChatColumn({
           onClick={onRemove}
           title={`Remove ${model.label} from this comparison`}
           aria-label={`Remove ${model.label}`}
-          className="shrink-0 rounded-md px-1.5 py-0.5 text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-700 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+          // -my keeps the header height unchanged while the padding buys a
+          // finger-sized hit area around the small glyph
+          className="-my-1.5 shrink-0 rounded-md px-2.5 py-2 text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-700 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
         >
           ✕
         </button>
@@ -68,10 +76,11 @@ export function ChatColumn({
 
         {state.messages.map((msg, i) =>
           msg.role === 'user' ? (
-            // user prompts: right-shifted, slightly raised surface
+            // user prompts: right-aligned and only as wide as their text -
+            // a full-width bar made a two-letter "ok" read like a banner
             <div
               key={i}
-              className="ml-8 rounded-lg bg-zinc-100 px-3.5 py-2.5 text-base leading-relaxed text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200"
+              className="ml-auto w-fit max-w-[85%] rounded-lg bg-zinc-100 px-3.5 py-2.5 text-base leading-relaxed text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200"
             >
               {msg.content}
             </div>
@@ -88,8 +97,16 @@ export function ChatColumn({
                 // answers: left-aligned, hairline border instead of a fill -
                 // keeps long text calm and readable. Markdown renderer turns
                 // the model's **bold** and bullets into real formatting.
+                // The response time lives inside the bubble as a footer;
+                // floating between bubbles it was ambiguous about which
+                // message it belonged to.
                 <div className="mr-8 rounded-lg border border-zinc-200 px-3.5 py-2.5 text-base leading-relaxed text-zinc-800 dark:border-zinc-800 dark:text-zinc-200">
                   <Markdown content={msg.content} />
+                  {msg.responseTimeMs !== undefined && (
+                    <p className="mt-1.5 text-right text-xs tabular-nums text-zinc-400 dark:text-zinc-500">
+                      {(msg.responseTimeMs / 1000).toFixed(2)}s
+                    </p>
+                  )}
                 </div>
               ) : (
                 // model ran tools but sent no text back - say so instead of
@@ -98,7 +115,9 @@ export function ChatColumn({
                   (no text in response - see tool calls above)
                 </p>
               )}
-              {msg.responseTimeMs !== undefined && (
+              {/* error and tool-only replies have no text bubble to host the
+                  time, so it stays a standalone line just for those */}
+              {msg.responseTimeMs !== undefined && (msg.error || msg.content.trim() === '') && (
                 <p className="text-right text-xs tabular-nums text-zinc-400 dark:text-zinc-500">
                   {(msg.responseTimeMs / 1000).toFixed(2)}s
                 </p>

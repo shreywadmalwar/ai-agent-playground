@@ -4,7 +4,7 @@
 // With 7+ providers, rendering everything at once stopped making sense;
 // columns now flex to fill the row and scroll horizontally past four.
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { MODELS } from './types'
 import { useSettings } from './hooks/useSettings'
 import { useLeaderboard } from './hooks/useLeaderboard'
@@ -68,6 +68,26 @@ export default function App() {
       setMobileModelId(selectedModels[0]?.id ?? '')
     }
   }, [selectedModels, mobileModelId])
+
+  // The tab strip scrolls sideways past ~4 models, and a clipped name is the
+  // only native hint that it does. Edge fades make the overflow explicit:
+  // each side shows a gradient only while there's actually content hidden
+  // beyond it, recomputed on scroll and resize.
+  const tabsRef = useRef<HTMLElement>(null)
+  const [tabFade, setTabFade] = useState({ left: false, right: false })
+  const updateTabFade = useCallback(() => {
+    const el = tabsRef.current
+    if (!el) return
+    setTabFade({
+      left: el.scrollLeft > 4,
+      right: el.scrollLeft + el.clientWidth < el.scrollWidth - 4,
+    })
+  }, [])
+  useEffect(() => {
+    updateTabFade()
+    window.addEventListener('resize', updateTabFade)
+    return () => window.removeEventListener('resize', updateTabFade)
+  }, [updateTabFade, selectedModels.length, view])
 
   // raised buttons - a light grey fill lifts them off the header, and a hairline
   // white inset along the top edge fakes a catch-light so they read as slightly
@@ -183,27 +203,48 @@ export default function App() {
       ) : (
         <>
           {/* mobile tab strip: dot + provider name per selected model, the
-              active one raised on a white surface. Hidden at md+ where the
-              grid shows everything anyway. */}
+              active one raised on a white surface. The dot doubles as a live
+              status light - it pulses while that model streams or runs tools,
+              and an error grows a small red companion dot - so you can see a
+              background column finish without switching to it. Hidden at md+
+              where the grid shows everything anyway. */}
           {selectedModels.length > 1 && (
-            <nav className="flex shrink-0 gap-1.5 overflow-x-auto border-b border-zinc-200 px-4 py-2 md:hidden dark:border-zinc-800">
-              {selectedModels.map((m) => (
-                <button
-                  key={m.id}
-                  onClick={() => setMobileModelId(m.id)}
-                  className={`flex shrink-0 items-center gap-2 whitespace-nowrap rounded-md border px-3 py-1.5 text-sm transition ${
-                    m.id === mobileModelId
-                      ? 'border-zinc-200 bg-white font-medium text-zinc-900 shadow-[0_1px_2px_rgba(0,0,0,0.05)] dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100'
-                      : 'border-transparent text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'
-                  }`}
-                >
-                  <span className={`h-1.5 w-1.5 rounded-full ${m.accent}`} />
-                  {/* just the provider half of "Groq · Llama 3.3 70B" - the
-                      full label is in the column header right below */}
-                  {m.label.split('·')[0].trim()}
-                </button>
-              ))}
-            </nav>
+            <div className="relative shrink-0 md:hidden">
+              <nav
+                ref={tabsRef}
+                onScroll={updateTabFade}
+                className="flex gap-1.5 overflow-x-auto border-b border-zinc-200 px-4 py-2 dark:border-zinc-800"
+              >
+                {selectedModels.map((m) => {
+                  const status = columns[m.id]?.status
+                  const busy = status === 'streaming' || status === 'tooling'
+                  return (
+                    <button
+                      key={m.id}
+                      onClick={() => setMobileModelId(m.id)}
+                      className={`flex min-h-10 shrink-0 items-center gap-2 whitespace-nowrap rounded-md border px-3 py-2 text-sm transition ${
+                        m.id === mobileModelId
+                          ? 'border-zinc-200 bg-white font-medium text-zinc-900 shadow-[0_1px_2px_rgba(0,0,0,0.05)] dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100'
+                          : 'border-transparent text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'
+                      }`}
+                    >
+                      <span className={`h-2 w-2 rounded-full ${m.accent} ${busy ? 'animate-pulse' : ''}`} />
+                      {/* just the provider half of "Groq · Llama 3.3 70B" -
+                          the column itself carries the full label on desktop */}
+                      {m.label.split('·')[0].trim()}
+                      {status === 'error' && <span className="h-1.5 w-1.5 rounded-full bg-red-500" />}
+                    </button>
+                  )
+                })}
+              </nav>
+              {/* overflow hints: a fade on whichever edge still hides tabs */}
+              {tabFade.left && (
+                <div className="pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-zinc-50 to-transparent dark:from-zinc-950" />
+              )}
+              {tabFade.right && (
+                <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-zinc-50 to-transparent dark:from-zinc-950" />
+              )}
+            </div>
           )}
 
           {/* count-aware grid: up to 3 models share one row; 4 becomes 2x2;
@@ -238,6 +279,9 @@ export default function App() {
                   state={columns[m.id]}
                   hasKey={apiKeys[m.id].trim() !== ''}
                   onRemove={() => toggleModel(m.id)}
+                  // with the tab strip up, the column header would repeat the
+                  // same dot + name 50px below it - drop it on phones
+                  headerHiddenOnMobile={selectedModels.length > 1}
                 />
               </div>
             ))}
