@@ -81,9 +81,10 @@ export default function App() {
             One prompt, many models, live tool traces
           </span>
         </h1>
-        {/* on narrow screens the buttons drop to their own full-width row and
-            scroll sideways instead of wrapping into a ragged second line */}
-        <div className="ml-auto flex w-full items-center gap-2 overflow-x-auto sm:w-auto">
+        {/* on narrow screens the buttons drop to their own full-width block
+            and wrap into tidy rows - sideways scrolling hid Settings/About
+            past the right edge with nothing hinting they existed */}
+        <div className="ml-auto flex w-full flex-wrap items-center gap-2 sm:w-auto sm:flex-nowrap">
           {view === 'compare' && (
             <button onClick={() => setView('picker')} className={headerButton}>
               ← Models
