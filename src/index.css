@@ -8,6 +8,15 @@ html, body, #root {
   height: 100%;
 }
 
+/* Mobile browsers lie about viewport height while the URL bar is showing -
+   a plain 100% chain leaves the message input hidden behind browser chrome.
+   dvh tracks the *visible* viewport as the bar collapses and expands. */
+@supports (height: 100dvh) {
+  html, body, #root {
+    height: 100dvh;
+  }
+}
+
 /* Apple-style view transition: content rises a touch and settles with the
    iOS sheet curve - fast start, long gentle landing. Re-triggered by React
    remounting the keyed view wrapper on navigation. Kept subtle (12px, no

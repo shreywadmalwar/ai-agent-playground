@@ -31,7 +31,8 @@ export function MessageInput({
   return (
     // items-stretch + self-stretch on the button = button height always
     // matches the textarea, even when the user drags it taller
-    <div className="flex items-stretch gap-2 border-t border-zinc-200 p-4 dark:border-zinc-800">
+    // p-3 on phones buys the textarea some room; p-4 from sm up as before
+    <div className="flex items-stretch gap-2 border-t border-zinc-200 p-3 sm:p-4 dark:border-zinc-800">
       <textarea
         value={value}
         onChange={(e) => setValue(e.target.value)}
